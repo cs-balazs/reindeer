@@ -1,0 +1,5 @@
+Cargo.lock
+target
+public/node_modules
+public/wasm
+todo.md
