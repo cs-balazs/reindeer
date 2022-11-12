@@ -1,34 +1,12 @@
 use web_sys::{WebGl2RenderingContext, WebGlProgram, WebGlShader};
 
-// Can't read these from file, maybe try to load them in a hashmap in advance
-const BASIC_FRAG: &str = r#"#version 300 es
-precision highp float;
-out vec4 outColor;
-
-in vec4 frag_color;
-
-void main() {
-    outColor = frag_color;
-}
-"#;
-
-const BASIC_VERT: &str = r#"#version 300 es
-layout (location = 0) in vec3 position;
-layout (location = 1) in vec3 vert_color;
-        
-out vec4 frag_color;
-
-void main() {
-    gl_Position = vec4(position, 1.0);
-    frag_color = vec4(vert_color, 1.0);
-}
-"#;
+use crate::renderer::SHADERS;
 
 pub fn compile_program(ctx: &WebGl2RenderingContext, name: &str) -> WebGlProgram {
-    let fragment_shader = compile_shader(&ctx, WebGl2RenderingContext::FRAGMENT_SHADER, BASIC_FRAG)
+    let fragment_shader = compile_shader(&ctx, WebGl2RenderingContext::FRAGMENT_SHADER, name)
         .expect("Compiling fragmet shader failed");
 
-    let vertex_shader = compile_shader(&ctx, WebGl2RenderingContext::VERTEX_SHADER, BASIC_VERT)
+    let vertex_shader = compile_shader(&ctx, WebGl2RenderingContext::VERTEX_SHADER, name)
         .expect("Compiling vertex shader failed");
 
     link_program(&ctx, &vertex_shader, &fragment_shader)
@@ -37,13 +15,40 @@ pub fn compile_program(ctx: &WebGl2RenderingContext, name: &str) -> WebGlProgram
 fn compile_shader(
     ctx: &WebGl2RenderingContext,
     shader_type: u32,
-    file_path: &str,
+    name: &str,
 ) -> Result<WebGlShader, String> {
+    // TODO: Move there .get_file, .contents_utf8 calls to SHADERS constant
+    let shader_source = SHADERS
+        .get_file(format!(
+            "{}.{}.glsl",
+            name,
+            if shader_type == WebGl2RenderingContext::FRAGMENT_SHADER {
+                "frag"
+            } else {
+                "vert"
+            }
+        ))
+        .expect(
+            format!(
+                "Failed to get shader source file. Shader name: {}, type: {}",
+                name, shader_type
+            )
+            .as_str(),
+        )
+        .contents_utf8()
+        .expect(
+            format!(
+                "Failed to read shader source file content. Shader name: {}, type: {}",
+                name, shader_type
+            )
+            .as_str(),
+        );
+
     let shader = ctx
         .create_shader(shader_type)
         .ok_or_else(|| String::from("Unable to create shader object"))?;
 
-    ctx.shader_source(&shader, file_path);
+    ctx.shader_source(&shader, shader_source);
     ctx.compile_shader(&shader);
 
     if ctx

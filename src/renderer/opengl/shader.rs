@@ -1,32 +1,46 @@
-use std::ptr;
-use std::str;
-use std::{ffi::CString, fs};
-
 use gl::types::{GLchar, GLint};
+use std::{ffi::CString, ptr, str};
+
+use crate::renderer::SHADERS;
 
 pub fn compile_program(name: &str) -> u32 {
-    let fragment_shader = compile_shader(
-        gl::FRAGMENT_SHADER,
-        &format!("./src/renderer/opengl/shaders/{}.frag.glsl", name),
-    )
-    .unwrap();
-
-    let vertex_shader = compile_shader(
-        gl::VERTEX_SHADER,
-        &format!("./src/renderer/opengl/shaders/{}.vert.glsl", name),
-    )
-    .unwrap();
+    let fragment_shader = compile_shader(gl::FRAGMENT_SHADER, name).unwrap();
+    let vertex_shader = compile_shader(gl::VERTEX_SHADER, name).unwrap();
 
     link_program(vertex_shader, fragment_shader)
 }
 
-fn compile_shader(shader_type: u32, file_path: &str) -> Result<u32, String> {
+fn compile_shader(shader_type: u32, name: &str) -> Result<u32, String> {
     let shader: u32;
 
-    let contents = fs::read_to_string(file_path).expect(&format!("Failed to read {}", file_path));
+    let shader_source = SHADERS
+        .get_file(format!(
+            "{}.{}.glsl",
+            name,
+            if shader_type == gl::FRAGMENT_SHADER {
+                "frag"
+            } else {
+                "vert"
+            }
+        ))
+        .expect(
+            format!(
+                "Failed to get shader source file. Shader name: {}, type: {}",
+                name, shader_type
+            )
+            .as_str(),
+        )
+        .contents_utf8()
+        .expect(
+            format!(
+                "Failed to read shader source file content. Shader name: {}, type: {}",
+                name, shader_type
+            )
+            .as_str(),
+        );
 
     unsafe {
-        let c_str = CString::new(contents.as_bytes()).unwrap();
+        let c_str = CString::new(shader_source.as_bytes()).unwrap();
         shader = gl::CreateShader(shader_type);
         gl::ShaderSource(shader, 1, &c_str.as_ptr(), 0 as *const i32);
         gl::CompileShader(shader);

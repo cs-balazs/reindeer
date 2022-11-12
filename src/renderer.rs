@@ -21,6 +21,7 @@ mod scene;
 mod vertex;
 
 use entity::Entity;
+use include_dir::{include_dir, Dir};
 use scene::Scene;
 use vertex::Vertex;
 
@@ -28,6 +29,11 @@ use crate::math::rotate;
 
 pub const WINDOW_WIDTH: u16 = 500;
 pub const WINDOW_HEIGHT: u16 = 500;
+
+#[cfg(feature = "webgl")]
+pub const SHADERS: Dir = include_dir!("$CARGO_MANIFEST_DIR/assets/shaders/webgl");
+#[cfg(feature = "opengl")]
+pub const SHADERS: Dir = include_dir!("$CARGO_MANIFEST_DIR/assets/shaders/opengl");
 
 pub trait RendererBackend {
     type Context;
