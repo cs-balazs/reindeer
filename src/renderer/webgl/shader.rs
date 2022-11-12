@@ -17,7 +17,6 @@ fn compile_shader(
     shader_type: u32,
     name: &str,
 ) -> Result<WebGlShader, String> {
-    // TODO: Move there .get_file, .contents_utf8 calls to SHADERS constant
     let shader_source = SHADERS[format!(
         "{}.{}.glsl",
         name,
