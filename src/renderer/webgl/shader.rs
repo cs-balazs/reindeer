@@ -18,31 +18,16 @@ fn compile_shader(
     name: &str,
 ) -> Result<WebGlShader, String> {
     // TODO: Move there .get_file, .contents_utf8 calls to SHADERS constant
-    let shader_source = SHADERS
-        .get_file(format!(
-            "{}.{}.glsl",
-            name,
-            if shader_type == WebGl2RenderingContext::FRAGMENT_SHADER {
-                "frag"
-            } else {
-                "vert"
-            }
-        ))
-        .expect(
-            format!(
-                "Failed to get shader source file. Shader name: {}, type: {}",
-                name, shader_type
-            )
-            .as_str(),
-        )
-        .contents_utf8()
-        .expect(
-            format!(
-                "Failed to read shader source file content. Shader name: {}, type: {}",
-                name, shader_type
-            )
-            .as_str(),
-        );
+    let shader_source = SHADERS[format!(
+        "{}.{}.glsl",
+        name,
+        if shader_type == WebGl2RenderingContext::FRAGMENT_SHADER {
+            "frag"
+        } else {
+            "vert"
+        }
+    )
+    .as_str()];
 
     let shader = ctx
         .create_shader(shader_type)

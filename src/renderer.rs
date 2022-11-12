@@ -1,5 +1,7 @@
 #[cfg(feature = "webgl")]
 pub mod webgl;
+use std::{collections::HashMap, hash::Hash};
+
 #[cfg(feature = "webgl")]
 use wasm_bindgen::prelude::wasm_bindgen;
 #[cfg(feature = "webgl")]
@@ -21,7 +23,7 @@ mod scene;
 mod vertex;
 
 use entity::Entity;
-use include_dir::{include_dir, Dir};
+use include_dir::{include_dir, Dir, DirEntry::File};
 use scene::Scene;
 use vertex::Vertex;
 
@@ -31,9 +33,27 @@ pub const WINDOW_WIDTH: u16 = 500;
 pub const WINDOW_HEIGHT: u16 = 500;
 
 #[cfg(feature = "webgl")]
-pub const SHADERS: Dir = include_dir!("$CARGO_MANIFEST_DIR/assets/shaders/webgl");
+const SHADERS_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/assets/shaders/webgl");
 #[cfg(feature = "opengl")]
-pub const SHADERS: Dir = include_dir!("$CARGO_MANIFEST_DIR/assets/shaders/opengl");
+const SHADERS_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/assets/shaders/opengl");
+
+lazy_static! {
+    pub static ref SHADERS: HashMap<&'static str, &'static str> = {
+        let mut map = HashMap::<&str, &str>::new();
+
+        SHADERS_DIR.entries().iter().for_each(|entry| {
+            if let File(f) = entry {
+                let name = f.path().to_str().unwrap();
+                let content = f.contents_utf8().unwrap();
+                map.insert(name.clone(), content.clone());
+            } else {
+                panic!("SHADERS initialization failed");
+            }
+        });
+
+        map
+    };
+}
 
 pub trait RendererBackend {
     type Context;

@@ -13,31 +13,16 @@ pub fn compile_program(name: &str) -> u32 {
 fn compile_shader(shader_type: u32, name: &str) -> Result<u32, String> {
     let shader: u32;
 
-    let shader_source = SHADERS
-        .get_file(format!(
-            "{}.{}.glsl",
-            name,
-            if shader_type == gl::FRAGMENT_SHADER {
-                "frag"
-            } else {
-                "vert"
-            }
-        ))
-        .expect(
-            format!(
-                "Failed to get shader source file. Shader name: {}, type: {}",
-                name, shader_type
-            )
-            .as_str(),
-        )
-        .contents_utf8()
-        .expect(
-            format!(
-                "Failed to read shader source file content. Shader name: {}, type: {}",
-                name, shader_type
-            )
-            .as_str(),
-        );
+    let shader_source = SHADERS[format!(
+        "{}.{}.glsl",
+        name,
+        if shader_type == gl::FRAGMENT_SHADER {
+            "frag"
+        } else {
+            "vert"
+        }
+    )
+    .as_str()];
 
     unsafe {
         let c_str = CString::new(shader_source.as_bytes()).unwrap();
