@@ -6,12 +6,12 @@ use std::{ffi::c_void, sync::mpsc::Receiver};
 
 mod shader;
 
-pub struct Context<'a> {
+pub struct Context {
     glfw: glfw::Glfw,
     window: glfw::Window,
     events: Receiver<(f64, WindowEvent)>,
 
-    pub scenes: Vec<Scene<'a>>,
+    pub scenes: Vec<Scene>,
 }
 
 pub type Buffer = u32;
@@ -19,8 +19,8 @@ pub type Program = u32;
 pub type Shader = u32;
 pub type Vao = u32;
 
-impl<'a> RendererBackend for Context<'a> {
-    type Context = Context<'a>;
+impl RendererBackend for Context {
+    type Context = Context;
     type Buffer = Buffer;
     type Program = Program;
     type Shader = Shader;
@@ -68,7 +68,11 @@ impl<'a> RendererBackend for Context<'a> {
 
         let (fb_width, fb_height) = window.get_framebuffer_size();
 
-        unsafe { gl::Viewport(0, 0, fb_width, fb_height) };
+        unsafe {
+            gl::Viewport(0, 0, fb_width, fb_height);
+            gl::Enable(gl::DEPTH_TEST);
+            // gl::PolygonMode(gl::FRONT_AND_BACK, gl::LINE);
+        };
 
         Context {
             glfw,
@@ -165,5 +169,11 @@ impl<'a> RendererBackend for Context<'a> {
 
     fn after_draw(&mut self) {
         self.window.swap_buffers();
+    }
+
+    fn draw_loop(mut draw_frame: impl FnMut() + 'static) {
+        loop {
+            draw_frame();
+        }
     }
 }

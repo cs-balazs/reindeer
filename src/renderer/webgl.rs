@@ -9,11 +9,11 @@ use web_sys::{
     Window,
 };
 
-pub struct Context<'a> {
+pub struct Context {
     context: WebGl2RenderingContext,
     window: Window,
 
-    pub scenes: Vec<Scene<'a>>,
+    pub scenes: Vec<Scene>,
 }
 
 pub type Buffer = WebGlBuffer;
@@ -21,14 +21,14 @@ pub type Program = WebGlProgram;
 pub type Shader = WebGlShader;
 pub type Vao = WebGlVertexArrayObject;
 
-impl<'a> RendererBackend for Context<'a> {
+impl RendererBackend for Context {
     type Buffer = Buffer;
-    type Context = Context<'a>;
+    type Context = Context;
     type Program = Program;
     type Shader = Shader;
     type Vao = Vao;
 
-    fn new() -> Context<'a> {
+    fn new() -> Context {
         let window = web_sys::window().unwrap();
         let document = window.document().unwrap();
         let body = document.query_selector("body").unwrap().unwrap();
@@ -49,6 +49,8 @@ impl<'a> RendererBackend for Context<'a> {
             .unwrap()
             .dyn_into::<WebGl2RenderingContext>()
             .unwrap();
+
+        context.enable(WebGl2RenderingContext::DEPTH_TEST);
 
         Context {
             context,
@@ -133,6 +135,25 @@ impl<'a> RendererBackend for Context<'a> {
     }
 
     fn after_draw(&mut self) {
-        sleep(time::Duration::from_millis(1))
+        // sleep(time::Duration::from_millis(5))
     }
+
+    fn draw_loop(mut draw_frame: impl FnMut() + 'static) {
+        let f = Rc::new(RefCell::new(None));
+        let g = f.clone();
+
+        *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
+            draw_frame();
+            request_animation_frame(f.borrow().as_ref().unwrap());
+        }) as Box<dyn FnMut()>));
+
+        request_animation_frame(g.borrow().as_ref().unwrap());
+    }
+}
+
+fn request_animation_frame(f: &Closure<dyn FnMut()>) -> i32 {
+    window()
+        .unwrap()
+        .request_animation_frame(f.as_ref().unchecked_ref())
+        .expect("should register `requestAnimationFrame` OK")
 }
