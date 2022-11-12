@@ -1,9 +1,9 @@
 mod shader;
 
-use super::{RendererBackend, Scene, WINDOW_HEIGHT, WINDOW_WIDTH};
-use core::time;
-use std::{cell::RefCell, rc::Rc, thread::sleep, vec};
-use wasm_bindgen::{prelude::Closure, JsCast, JsValue};
+use super::scene::Scene;
+use super::{RendererBackend, WINDOW_HEIGHT, WINDOW_WIDTH};
+use std::{cell::RefCell, rc::Rc, vec};
+use wasm_bindgen::{prelude::Closure, JsCast};
 use web_sys::{
     window, WebGl2RenderingContext, WebGlBuffer, WebGlProgram, WebGlShader, WebGlVertexArrayObject,
     Window,
