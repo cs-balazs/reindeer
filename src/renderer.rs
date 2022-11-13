@@ -1,7 +1,7 @@
+use std::{collections::HashMap, ffi::CString, str};
+
 #[cfg(feature = "webgl")]
 pub mod webgl;
-use std::{collections::HashMap, hash::Hash};
-
 #[cfg(feature = "webgl")]
 use wasm_bindgen::prelude::wasm_bindgen;
 #[cfg(feature = "webgl")]
@@ -20,6 +20,7 @@ pub use opengl as lib;
 
 mod entity;
 mod scene;
+mod shader;
 mod vertex;
 
 use entity::Entity;
@@ -27,7 +28,9 @@ use include_dir::{include_dir, Dir, DirEntry::File};
 use scene::Scene;
 use vertex::Vertex;
 
-use crate::math::rotate;
+use crate::math::{get_rotation_matrix, rotate};
+
+use self::{lib::Shader, shader::Shader as S};
 
 pub const WINDOW_WIDTH: u16 = 500;
 pub const WINDOW_HEIGHT: u16 = 500;
@@ -109,7 +112,8 @@ pub trait RendererBackend {
 pub fn run() {
     let mut ctx = lib::Context::new();
 
-    let program = ctx.compile_program("basic");
+    let shader_program = lib::shader::Shader::new("basic");
+    shader_program.set_uniform("u_color", [1.0, 0.0, 0.0]);
 
     let bottom = Vertex {
         position: [0.0, -0.8, 0.0],
@@ -175,7 +179,7 @@ pub fn run() {
             behind.clone(),
             left.clone(),
         ],
-        program,
+        shader_program,
         &ctx,
     );
     let scene = Scene::new(vec![obj]);
@@ -183,20 +187,26 @@ pub fn run() {
 
     ctx.set_clear_color(1.0f32, 1.0f32, 0.0f32, 1.0f32);
 
+    let rotation_angle = 0.002;
+    let mut rotation = 0.0;
+
     lib::Context::draw_loop(move || {
         ctx.before_draw();
 
-        if let Some(ref mut current_scene) = &mut ctx.scenes.first_mut() {
-            if let Some(ref mut first_entity) = &mut current_scene.entities.first_mut() {
-                for vertex in &mut first_entity.vertices {
-                    vertex.position = rotate(vertex.position, 0.002, 0.002, 0.002);
-                }
-            }
-        }
+        let rotation_matrix = get_rotation_matrix(rotation, rotation, rotation);
 
         if let Some(current_scene) = ctx.scenes.first() {
             current_scene.draw(&ctx);
+
+            current_scene
+                .entities
+                .first()
+                .unwrap()
+                .shader
+                .set_uniform("u_model", rotation_matrix);
         }
+
+        rotation += rotation_angle;
 
         ctx.after_draw();
     });

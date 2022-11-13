@@ -93,3 +93,33 @@ pub fn rotate(vector: [f32; 3], alpha_yaw: f32, beta_pitch: f32, gamma_roll: f32
 
     vec3_mat3_mul(vector, rot_mat)
 }
+
+pub fn get_rotation_matrix(alpha_yaw: f32, beta_pitch: f32, gamma_roll: f32) -> [[f32; 3]; 3] {
+    let r_alpha = [
+        [alpha_yaw.cos(), -alpha_yaw.sin(), 0f32],
+        [alpha_yaw.sin(), alpha_yaw.cos(), 0f32],
+        [0f32, 0f32, 1f32],
+    ];
+
+    let r_beta = [
+        [beta_pitch.cos(), 0f32, beta_pitch.sin()],
+        [0f32, 1f32, 0f32],
+        [-beta_pitch.sin(), 0f32, beta_pitch.cos()],
+    ];
+
+    let r_gamma = [
+        [1f32, 0f32, 0f32],
+        [0f32, gamma_roll.cos(), -gamma_roll.sin()],
+        [0f32, gamma_roll.sin(), gamma_roll.cos()],
+    ];
+
+    let product = mat3_mat3_mul(mat3_mat3_mul(r_alpha, r_beta), r_gamma);
+
+    let rot_mat = [
+        [product[0][0], product[0][1], product[0][2]],
+        [product[1][0], product[1][1], product[1][2]],
+        [product[2][0], product[2][1], product[2][2]],
+    ];
+
+    rot_mat
+}

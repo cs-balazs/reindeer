@@ -1,7 +1,51 @@
+use super::super::SHADERS;
 use gl::types::{GLchar, GLint};
-use std::{ffi::CString, ptr, str};
+use std::{collections::HashSet, ffi::CString, ptr, str};
 
-use crate::renderer::SHADERS;
+#[derive(Debug)]
+pub struct Shader {
+    pub id: super::Shader,
+    pub uniforms: HashSet<String>,
+}
+
+impl Shader {
+    pub fn new(name: &str) -> Shader {
+        let id = compile_program(name);
+
+        // TODO: Parse uniform names in Shader.uniforms
+
+        Shader {
+            id,
+            uniforms: HashSet::new(),
+        }
+    }
+}
+
+impl super::super::shader::Shader<[f32; 3]> for Shader {
+    fn set_uniform(&self, name: &str, input: [f32; 3]) {
+        let loc: i32;
+
+        unsafe {
+            let c_str = CString::new(name.as_bytes()).unwrap();
+            loc = gl::GetUniformLocation(self.id, c_str.as_ptr());
+            gl::UseProgram(self.id);
+            gl::Uniform3f(loc, input[0], input[1], input[2]);
+        };
+    }
+}
+
+impl super::super::shader::Shader<[[f32; 3]; 3]> for Shader {
+    fn set_uniform(&self, name: &str, input: [[f32; 3]; 3]) {
+        let loc: i32;
+
+        unsafe {
+            let c_str = CString::new(name.as_bytes()).unwrap();
+            loc = gl::GetUniformLocation(self.id, c_str.as_ptr());
+            gl::UseProgram(self.id);
+            gl::UniformMatrix3fv(loc, 1, 0, &input[0][0]);
+        };
+    }
+}
 
 pub fn compile_program(name: &str) -> u32 {
     let fragment_shader = compile_shader(gl::FRAGMENT_SHADER, name).unwrap();

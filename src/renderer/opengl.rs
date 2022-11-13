@@ -4,7 +4,7 @@ use glfw::{Context as GLFWContext, WindowEvent};
 use std::mem;
 use std::{ffi::c_void, sync::mpsc::Receiver};
 
-mod shader;
+pub mod shader;
 
 pub struct Context {
     glfw: glfw::Glfw,
