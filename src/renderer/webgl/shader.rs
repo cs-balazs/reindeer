@@ -67,6 +67,41 @@ impl super::super::shader::Shader<[[f32; 3]; 3]> for Shader {
     }
 }
 
+impl super::super::shader::Shader<[[f32; 4]; 4]> for Shader {
+    fn set_uniform(&self, name: &str, input: [[f32; 4]; 4]) {
+        let loc = CTX
+            .context
+            .borrow()
+            .context
+            .get_uniform_location(&self.id, name)
+            .expect(format!("Failed to find uniform location: {}", name).as_str());
+        CTX.context.borrow().context.use_program(Some(&self.id));
+
+        let input: [f32; 16] = [
+            input[0][0],
+            input[0][1],
+            input[0][2],
+            input[0][3],
+            input[1][0],
+            input[1][1],
+            input[1][2],
+            input[1][3],
+            input[2][0],
+            input[2][1],
+            input[2][2],
+            input[2][3],
+            input[3][0],
+            input[3][1],
+            input[3][2],
+            input[3][3],
+        ];
+        CTX.context
+            .borrow()
+            .context
+            .uniform_matrix4fv_with_f32_array(Some(&loc), false, &input);
+    }
+}
+
 pub fn compile_program(name: &str) -> WebGlProgram {
     let fragment_shader = compile_shader(WebGl2RenderingContext::FRAGMENT_SHADER, name)
         .expect("Compiling fragmet shader failed");

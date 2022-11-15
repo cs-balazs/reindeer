@@ -47,6 +47,19 @@ impl super::super::shader::Shader<[[f32; 3]; 3]> for Shader {
     }
 }
 
+impl super::super::shader::Shader<[[f32; 4]; 4]> for Shader {
+    fn set_uniform(&self, name: &str, input: [[f32; 4]; 4]) {
+        let loc: i32;
+
+        unsafe {
+            let c_str = CString::new(name.as_bytes()).unwrap();
+            loc = gl::GetUniformLocation(self.id, c_str.as_ptr());
+            gl::UseProgram(self.id);
+            gl::UniformMatrix4fv(loc, 1, 0, &input[0][0]);
+        };
+    }
+}
+
 pub fn compile_program(name: &str) -> u32 {
     let fragment_shader = compile_shader(gl::FRAGMENT_SHADER, name).unwrap();
     let vertex_shader = compile_shader(gl::VERTEX_SHADER, name).unwrap();

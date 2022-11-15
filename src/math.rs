@@ -18,7 +18,7 @@ fn mat3_mat3_mul(a: [[f32; 3]; 3], b: [[f32; 3]; 3]) -> [[f32; 3]; 3] {
     ]
 }
 
-fn mat4_mat4_mul(a: [[f32; 4]; 4], b: [[f32; 4]; 4]) -> [[f32; 4]; 4] {
+pub fn mat4_mat4_mul(a: [[f32; 4]; 4], b: [[f32; 4]; 4]) -> [[f32; 4]; 4] {
     [
         [
             a[0][0] * b[0][0] + a[0][1] * b[1][0] + a[0][2] * b[2][0] + a[0][3] * b[3][0],
@@ -94,7 +94,7 @@ pub fn rotate(vector: [f32; 3], alpha_yaw: f32, beta_pitch: f32, gamma_roll: f32
     vec3_mat3_mul(vector, rot_mat)
 }
 
-pub fn get_rotation_matrix(alpha_yaw: f32, beta_pitch: f32, gamma_roll: f32) -> [[f32; 3]; 3] {
+pub fn get_rotation_matrix(alpha_yaw: f32, beta_pitch: f32, gamma_roll: f32) -> [[f32; 4]; 4] {
     let r_alpha = [
         [alpha_yaw.cos(), -alpha_yaw.sin(), 0f32],
         [alpha_yaw.sin(), alpha_yaw.cos(), 0f32],
@@ -115,11 +115,28 @@ pub fn get_rotation_matrix(alpha_yaw: f32, beta_pitch: f32, gamma_roll: f32) -> 
 
     let product = mat3_mat3_mul(mat3_mat3_mul(r_alpha, r_beta), r_gamma);
 
-    let rot_mat = [
-        [product[0][0], product[0][1], product[0][2]],
-        [product[1][0], product[1][1], product[1][2]],
-        [product[2][0], product[2][1], product[2][2]],
-    ];
+    [
+        [product[0][0], product[0][1], product[0][2], 0.0],
+        [product[1][0], product[1][1], product[1][2], 0.0],
+        [product[2][0], product[2][1], product[2][2], 0.0],
+        [0.0, 0.0, 0.0, 1.0],
+    ]
+}
 
-    rot_mat
+pub fn get_translation_matrix(x: f32, y: f32, z: f32) -> [[f32; 4]; 4] {
+    [
+        [1.0, 0.0, 0.0, x],
+        [0.0, 1.0, 0.0, y],
+        [0.0, 0.0, 1.0, z],
+        [0.0, 0.0, 0.0, 1.0],
+    ]
+}
+
+pub fn get_scale_matrix(x: f32, y: f32, z: f32) -> [[f32; 4]; 4] {
+    [
+        [x, 0.0, 0.0, 0.0],
+        [0.0, y, 0.0, 0.0],
+        [0.0, 0.0, z, 0.0],
+        [0.0, 0.0, 0.0, 1.0],
+    ]
 }

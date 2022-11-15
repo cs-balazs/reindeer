@@ -28,7 +28,7 @@ use include_dir::{include_dir, Dir, DirEntry::File};
 use scene::Scene;
 use vertex::Vertex;
 
-use crate::math::get_rotation_matrix;
+use crate::math::{get_rotation_matrix, get_scale_matrix, get_translation_matrix, mat4_mat4_mul};
 
 use self::{lib::Shader, shader::Shader as S};
 
@@ -204,12 +204,17 @@ pub fn run() {
         .set_clear_color(1.0f32, 1.0f32, 0.0f32, 1.0f32);
 
     let rotation_angle = 0.002;
-    let mut rotation = 0.0;
+    let mut rotation_amount = 0.0;
+
+    let translation = get_translation_matrix(0.1, 0.0, 0.0);
+    let scale = get_scale_matrix(0.5, 0.5, 0.5);
 
     lib::Context::draw_loop(move || {
         CTX.context.borrow_mut().before_draw();
 
-        let rotation_matrix = get_rotation_matrix(rotation, rotation, rotation);
+        let rotation = get_rotation_matrix(rotation_amount, rotation_amount, rotation_amount);
+        let model = mat4_mat4_mul(rotation, translation);
+        let model = mat4_mat4_mul(model, scale);
 
         if let Some(current_scene) = CTX.context.borrow().scenes.first() {
             current_scene.draw(&CTX.context.borrow());
@@ -219,10 +224,10 @@ pub fn run() {
                 .first()
                 .unwrap()
                 .shader
-                .set_uniform("u_model", rotation_matrix);
+                .set_uniform("u_model", model);
         }
 
-        rotation += rotation_angle;
+        rotation_amount += rotation_angle;
 
         CTX.context.borrow_mut().after_draw();
     });
