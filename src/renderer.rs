@@ -213,8 +213,7 @@ pub fn run() {
         CTX.context.borrow_mut().before_draw();
 
         let rotation = get_rotation_matrix(rotation_amount, rotation_amount, rotation_amount);
-        let model = mat4_mat4_mul(rotation, translation);
-        let model = mat4_mat4_mul(model, scale);
+        let model = mat4_mat4_mul(mat4_mat4_mul(rotation, translation), scale);
 
         if let Some(current_scene) = CTX.context.borrow().scenes.first() {
             current_scene.draw(&CTX.context.borrow());
