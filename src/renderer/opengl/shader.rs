@@ -4,7 +4,7 @@ use std::{collections::HashSet, ffi::CString, ptr, str};
 
 #[derive(Debug)]
 pub struct Shader {
-    pub id: super::Shader,
+    pub id: super::Program,
     pub uniforms: HashSet<String>,
 }
 

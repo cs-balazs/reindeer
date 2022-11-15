@@ -1,4 +1,4 @@
-use std::{collections::HashMap, ffi::CString, str};
+use std::{cell::RefCell, collections::HashMap, str};
 
 #[cfg(feature = "webgl")]
 pub mod webgl;
@@ -28,7 +28,7 @@ use include_dir::{include_dir, Dir, DirEntry::File};
 use scene::Scene;
 use vertex::Vertex;
 
-use crate::math::{get_rotation_matrix, rotate};
+use crate::math::get_rotation_matrix;
 
 use self::{lib::Shader, shader::Shader as S};
 
@@ -39,6 +39,20 @@ pub const WINDOW_HEIGHT: u16 = 500;
 const SHADERS_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/assets/shaders/webgl");
 #[cfg(feature = "opengl")]
 const SHADERS_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/assets/shaders/opengl");
+
+// https://github.com/rustwasm/wasm-bindgen/issues/1505#issuecomment-489300331
+struct WebGlContext {
+    context: RefCell<lib::Context>,
+}
+
+unsafe impl Send for WebGlContext {}
+unsafe impl Sync for WebGlContext {}
+
+lazy_static! {
+    static ref CTX: WebGlContext = WebGlContext {
+        context: RefCell::from(lib::Context::new()),
+    };
+}
 
 lazy_static! {
     pub static ref SHADERS: HashMap<&'static str, &'static str> = {
@@ -110,7 +124,7 @@ pub trait RendererBackend {
 
 #[cfg_attr(feature = "webgl", wasm_bindgen(start))]
 pub fn run() {
-    let mut ctx = lib::Context::new();
+    CTX.context.borrow(); // To initialize OpenGL
 
     let shader_program = lib::shader::Shader::new("basic");
     shader_program.set_uniform("u_color", [1.0, 0.0, 0.0]);
@@ -180,23 +194,25 @@ pub fn run() {
             left.clone(),
         ],
         shader_program,
-        &ctx,
+        &CTX.context.borrow(),
     );
     let scene = Scene::new(vec![obj]);
-    ctx.scenes.push(scene);
+    CTX.context.borrow_mut().scenes.push(scene);
 
-    ctx.set_clear_color(1.0f32, 1.0f32, 0.0f32, 1.0f32);
+    CTX.context
+        .borrow_mut()
+        .set_clear_color(1.0f32, 1.0f32, 0.0f32, 1.0f32);
 
     let rotation_angle = 0.002;
     let mut rotation = 0.0;
 
     lib::Context::draw_loop(move || {
-        ctx.before_draw();
+        CTX.context.borrow_mut().before_draw();
 
         let rotation_matrix = get_rotation_matrix(rotation, rotation, rotation);
 
-        if let Some(current_scene) = ctx.scenes.first() {
-            current_scene.draw(&ctx);
+        if let Some(current_scene) = CTX.context.borrow().scenes.first() {
+            current_scene.draw(&CTX.context.borrow());
 
             current_scene
                 .entities
@@ -208,6 +224,6 @@ pub fn run() {
 
         rotation += rotation_angle;
 
-        ctx.after_draw();
+        CTX.context.borrow_mut().after_draw();
     });
 }

@@ -1,7 +1,8 @@
-mod shader;
+pub mod shader;
 
 use super::scene::Scene;
 use super::{RendererBackend, WINDOW_HEIGHT, WINDOW_WIDTH};
+use std::sync::Mutex;
 use std::{cell::RefCell, rc::Rc, vec};
 use wasm_bindgen::{prelude::Closure, JsCast};
 use web_sys::{
@@ -60,7 +61,7 @@ impl RendererBackend for Context {
     }
 
     fn compile_program(&self, name: &str) -> Self::Program {
-        shader::compile_program(&self.context, name)
+        shader::compile_program(name)
     }
 
     fn use_program(&self, program: &WebGlProgram) -> () {
