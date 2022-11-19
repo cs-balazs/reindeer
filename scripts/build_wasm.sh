@@ -9,4 +9,5 @@ wasm-bindgen \
 
 cd public
 
+npm i
 npm run build
