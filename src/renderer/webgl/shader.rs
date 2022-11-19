@@ -4,7 +4,7 @@ use web_sys::{WebGl2RenderingContext, WebGlProgram, WebGlShader};
 
 use crate::renderer::{CTX, SHADERS};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Shader {
     pub id: super::Program,
     pub uniforms: HashSet<String>,

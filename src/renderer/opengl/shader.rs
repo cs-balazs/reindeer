@@ -2,7 +2,7 @@ use super::super::SHADERS;
 use gl::types::{GLchar, GLint};
 use std::{collections::HashSet, ffi::CString, ptr, str};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Shader {
     pub id: super::Program,
     pub uniforms: HashSet<String>,

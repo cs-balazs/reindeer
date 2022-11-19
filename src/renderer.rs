@@ -23,6 +23,9 @@ mod scene;
 mod shader;
 mod vertex;
 
+// ((?:-| )[0-9]\.[0-9]f32), ((?:-| )[0-9]\.[0-9]f32), ((?:-| )[0-9]\.[0-9]f32), ((?:-| )[0-9]\.[0-9]f32), ((?:-| )[0-9]\.[0-9]f32), ((?:-| )[0-9]\.[0-9]f32)
+// Vertex { position: [$1, $2, $3], normal:  Some([$4, $5, $6]), color: None }
+
 use entity::Entity;
 use include_dir::{include_dir, Dir, DirEntry::File};
 use scene::Scene;
@@ -126,107 +129,246 @@ pub trait RendererBackend {
 pub fn run() {
     CTX.context.borrow(); // To initialize OpenGL
 
-    let shader_program = lib::shader::Shader::new("basic");
-    shader_program.set_uniform("u_color", [1.0, 0.0, 0.0]);
+    let light_position = [0.5, 0.5, -0.8];
+    let light_color = [0.5, 0.5, 1.0];
+    let object_color = [1.0, 0.5, 0.5];
 
-    let bottom = Vertex {
-        position: [0.0, -0.8, 0.0],
-        color: Some([1.0, 0.0, 0.0]),
-        normal: None,
-    };
+    let shader_program = lib::shader::Shader::new("phong_light_object");
+    shader_program.set_uniform("u_color", object_color);
+    shader_program.set_uniform("u_light_color", light_color);
+    shader_program.set_uniform("u_light_position", light_position);
+    shader_program.set_uniform("u_camera_position", [0.0, 0.0, -1.0]);
 
-    let top = Vertex {
-        position: [0.0, 0.8, 0.0],
-        color: Some([0.0, 1.0, 0.0]),
-        normal: None,
-    };
+    let shader_program_obj2 = lib::shader::Shader::new("uniform_color");
+    shader_program_obj2.set_uniform("u_color", light_color);
 
-    let left = Vertex {
-        position: [-0.8, 0.0, 0.0],
-        color: Some([0.0, 0.0, 1.0]),
-        normal: None,
-    };
+    let vertices = vec![
+        Vertex {
+            position: [-0.5f32, -0.5f32, -0.5f32],
+            normal: Some([0.0f32, 0.0f32, -1.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [0.5f32, -0.5f32, -0.5f32],
+            normal: Some([0.0f32, 0.0f32, -1.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [0.5f32, 0.5f32, -0.5f32],
+            normal: Some([0.0f32, 0.0f32, -1.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [0.5f32, 0.5f32, -0.5f32],
+            normal: Some([0.0f32, 0.0f32, -1.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [-0.5f32, 0.5f32, -0.5f32],
+            normal: Some([0.0f32, 0.0f32, -1.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [-0.5f32, -0.5f32, -0.5f32],
+            normal: Some([0.0f32, 0.0f32, -1.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [-0.5f32, -0.5f32, 0.5f32],
+            normal: Some([0.0f32, 0.0f32, 1.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [0.5f32, -0.5f32, 0.5f32],
+            normal: Some([0.0f32, 0.0f32, 1.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [0.5f32, 0.5f32, 0.5f32],
+            normal: Some([0.0f32, 0.0f32, 1.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [0.5f32, 0.5f32, 0.5f32],
+            normal: Some([0.0f32, 0.0f32, 1.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [-0.5f32, 0.5f32, 0.5f32],
+            normal: Some([0.0f32, 0.0f32, 1.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [-0.5f32, -0.5f32, 0.5f32],
+            normal: Some([0.0f32, 0.0f32, 1.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [-0.5f32, 0.5f32, 0.5f32],
+            normal: Some([-1.0f32, 0.0f32, 0.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [-0.5f32, 0.5f32, -0.5f32],
+            normal: Some([-1.0f32, 0.0f32, 0.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [-0.5f32, -0.5f32, -0.5f32],
+            normal: Some([-1.0f32, 0.0f32, 0.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [-0.5f32, -0.5f32, -0.5f32],
+            normal: Some([-1.0f32, 0.0f32, 0.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [-0.5f32, -0.5f32, 0.5f32],
+            normal: Some([-1.0f32, 0.0f32, 0.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [-0.5f32, 0.5f32, 0.5f32],
+            normal: Some([-1.0f32, 0.0f32, 0.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [0.5f32, 0.5f32, 0.5f32],
+            normal: Some([1.0f32, 0.0f32, 0.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [0.5f32, 0.5f32, -0.5f32],
+            normal: Some([1.0f32, 0.0f32, 0.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [0.5f32, -0.5f32, -0.5f32],
+            normal: Some([1.0f32, 0.0f32, 0.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [0.5f32, -0.5f32, -0.5f32],
+            normal: Some([1.0f32, 0.0f32, 0.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [0.5f32, -0.5f32, 0.5f32],
+            normal: Some([1.0f32, 0.0f32, 0.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [0.5f32, 0.5f32, 0.5f32],
+            normal: Some([1.0f32, 0.0f32, 0.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [-0.5f32, -0.5f32, -0.5f32],
+            normal: Some([0.0f32, -1.0f32, 0.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [0.5f32, -0.5f32, -0.5f32],
+            normal: Some([0.0f32, -1.0f32, 0.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [0.5f32, -0.5f32, 0.5f32],
+            normal: Some([0.0f32, -1.0f32, 0.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [0.5f32, -0.5f32, 0.5f32],
+            normal: Some([0.0f32, -1.0f32, 0.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [-0.5f32, -0.5f32, 0.5f32],
+            normal: Some([0.0f32, -1.0f32, 0.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [-0.5f32, -0.5f32, -0.5f32],
+            normal: Some([0.0f32, -1.0f32, 0.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [-0.5f32, 0.5f32, -0.5f32],
+            normal: Some([0.0f32, 1.0f32, 0.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [0.5f32, 0.5f32, -0.5f32],
+            normal: Some([0.0f32, 1.0f32, 0.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [0.5f32, 0.5f32, 0.5f32],
+            normal: Some([0.0f32, 1.0f32, 0.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [0.5f32, 0.5f32, 0.5f32],
+            normal: Some([0.0f32, 1.0f32, 0.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [-0.5f32, 0.5f32, 0.5f32],
+            normal: Some([0.0f32, 1.0f32, 0.0f32]),
+            color: None,
+        },
+        Vertex {
+            position: [-0.5f32, 0.5f32, -0.5f32],
+            normal: Some([0.0f32, 1.0f32, 0.0f32]),
+            color: None,
+        },
+    ];
 
-    let right = Vertex {
-        position: [0.8, 0.0, 0.0],
-        color: Some([0.5, 0.5, 0.0]),
-        normal: None,
-    };
+    let obj = Entity::new(vertices.clone(), shader_program, &CTX.context.borrow());
+    let light_source = Entity::new(vertices.clone(), shader_program_obj2, &CTX.context.borrow());
 
-    let forward = Vertex {
-        position: [0.0, 0.0, 0.8],
-        color: Some([0.0, 0.5, 0.5]),
-        normal: None,
-    };
-
-    let behind = Vertex {
-        position: [0.0, 0.0, -0.8],
-        color: Some([0.5, 0.0, 0.5]),
-        normal: None,
-    };
-
-    // Construct one scene with one entity
-    let obj = Entity::new(
-        vec![
-            top.clone(),
-            left.clone(),
-            forward.clone(),
-            top.clone(),
-            forward.clone(),
-            right.clone(),
-            top.clone(),
-            right.clone(),
-            behind.clone(),
-            top.clone(),
-            behind.clone(),
-            left.clone(),
-            bottom.clone(),
-            left.clone(),
-            forward.clone(),
-            bottom.clone(),
-            forward.clone(),
-            right.clone(),
-            bottom.clone(),
-            right.clone(),
-            behind.clone(),
-            bottom.clone(),
-            behind.clone(),
-            left.clone(),
-        ],
-        shader_program,
-        &CTX.context.borrow(),
-    );
-    let scene = Scene::new(vec![obj]);
+    let scene = Scene::new(vec![obj, light_source]);
     CTX.context.borrow_mut().scenes.push(scene);
 
     CTX.context
         .borrow_mut()
-        .set_clear_color(1.0f32, 1.0f32, 0.0f32, 1.0f32);
+        .set_clear_color(1.0f32, 1.0f32, 1.0f32, 1.0f32);
 
     let rotation_angle = 0.002;
     let mut rotation_amount = 0.0;
+    let mut light_source_rotation_amount = 42.42;
 
-    let translation = get_translation_matrix(0.1, 0.0, 0.0);
-    let scale = get_scale_matrix(0.5, 0.5, 0.5);
+    let translation =
+        get_translation_matrix(light_position[0], light_position[1], light_position[2]);
+    let scale = get_scale_matrix(0.05, 0.05, 0.05);
+    let light_source_model = mat4_mat4_mul(translation, scale);
 
     lib::Context::draw_loop(move || {
         CTX.context.borrow_mut().before_draw();
 
         let rotation = get_rotation_matrix(rotation_amount, rotation_amount, rotation_amount);
-        let model = mat4_mat4_mul(mat4_mat4_mul(rotation, translation), scale);
+        let light_source_rotation = get_rotation_matrix(
+            light_source_rotation_amount,
+            light_source_rotation_amount,
+            light_source_rotation_amount,
+        );
 
         if let Some(current_scene) = CTX.context.borrow().scenes.first() {
             current_scene.draw(&CTX.context.borrow());
 
-            current_scene
-                .entities
-                .first()
-                .unwrap()
+            current_scene.entities[0]
                 .shader
-                .set_uniform("u_model", model);
+                .set_uniform("u_model", rotation);
+
+            current_scene.entities[1].shader.set_uniform(
+                "u_model",
+                mat4_mat4_mul(light_source_model, light_source_rotation),
+            );
         }
 
         rotation_amount += rotation_angle;
+        light_source_rotation_amount += rotation_angle;
 
         CTX.context.borrow_mut().after_draw();
     });

@@ -6,8 +6,8 @@ uniform vec3 u_color;
 
 in vec4 frag_color;
 
-out vec4 outColor;
+out vec4 out_frag_color;
 
 void main() {
-    outColor = vec4(u_color, 1.0);
+  out_frag_color = vec4(u_color, 1.0);
 }
