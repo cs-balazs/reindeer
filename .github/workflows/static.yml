@@ -20,7 +20,7 @@ concurrency:
   group: "pages"
   cancel-in-progress: true
 
-jobs: 
+jobs:
   # Single deploy job since we're just deploying
   deploy:
     environment:
@@ -31,14 +31,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Build
-        run:  "rustup target add wasm32-unknown-unknown && ./scripts/build_wasm.sh"
+        run: "rustup target add wasm32-unknown-unknown && ./scripts/build_wasm.sh"
       - name: Setup Pages
         uses: actions/configure-pages@v2
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
           # Upload entire repository
-          path: './docs'
+          path: "./public"
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1
