@@ -1,4 +1,5 @@
 cargo build --target wasm32-unknown-unknown --features webgl
+cargo update
 
 rm -rf ./public/wasm
 
