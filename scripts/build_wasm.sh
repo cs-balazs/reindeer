@@ -1,6 +1,5 @@
 cargo build --target wasm32-unknown-unknown --features webgl
 cargo install -f wasm-bindgen-cli
-cargo update
 
 rm -rf ./public/wasm
 
