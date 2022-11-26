@@ -1,4 +1,4 @@
-use super::{lib, types, vertex::Vertex, RendererBackend};
+use super::{lib, types, vertex::Vertex, RendererBackend, CTX};
 
 #[derive(Debug, Clone)]
 pub struct Entity {
@@ -11,7 +11,8 @@ pub struct Entity {
 }
 
 impl Entity {
-    pub fn new(vertices: Vec<Vertex>, shader: lib::shader::Shader, ctx: &lib::Context) -> Entity {
+    pub fn new(vertices: Vec<Vertex>, shader: lib::shader::Shader) -> Entity {
+        let ctx = &CTX.context.borrow();
         let vao = ctx.create_vertex_array();
         ctx.bind_vertex_array(&vao);
 

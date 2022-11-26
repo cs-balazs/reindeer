@@ -325,8 +325,8 @@ pub fn run() {
         },
     ];
 
-    let obj = Entity::new(vertices.clone(), shader_program, &CTX.context.borrow());
-    let light_source = Entity::new(vertices.clone(), shader_program_obj2, &CTX.context.borrow());
+    let obj = Entity::new(vertices.clone(), shader_program);
+    let light_source = Entity::new(vertices.clone(), shader_program_obj2);
 
     let scene = Scene::new(vec![obj, light_source]);
     CTX.context.borrow_mut().scenes.push(scene);
