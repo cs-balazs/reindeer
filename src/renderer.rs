@@ -22,6 +22,7 @@ mod entity;
 mod scene;
 mod shader;
 mod vertex;
+mod vertex_attribute;
 
 // ((?:-| )[0-9]\.[0-9]f32), ((?:-| )[0-9]\.[0-9]f32), ((?:-| )[0-9]\.[0-9]f32), ((?:-| )[0-9]\.[0-9]f32), ((?:-| )[0-9]\.[0-9]f32), ((?:-| )[0-9]\.[0-9]f32)
 // Vertex { position: [$1, $2, $3], normal:  Some([$4, $5, $6]), color: None }
@@ -30,6 +31,7 @@ use entity::Entity;
 use include_dir::{include_dir, Dir, DirEntry::File};
 use scene::Scene;
 use vertex::Vertex;
+use vertex_attribute::VertexAttribute;
 
 use crate::math::{get_rotation_matrix, get_scale_matrix, get_translation_matrix, mat4_mat4_mul};
 
@@ -142,198 +144,104 @@ pub fn run() {
     let shader_program_obj2 = lib::shader::Shader::new("uniform_color");
     shader_program_obj2.set_uniform("u_color", light_color);
 
-    let vertices = vec![
-        Vertex {
-            position: [-0.5f32, -0.5f32, -0.5f32],
-            normal: Some([0.0f32, 0.0f32, -1.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [0.5f32, -0.5f32, -0.5f32],
-            normal: Some([0.0f32, 0.0f32, -1.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [0.5f32, 0.5f32, -0.5f32],
-            normal: Some([0.0f32, 0.0f32, -1.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [0.5f32, 0.5f32, -0.5f32],
-            normal: Some([0.0f32, 0.0f32, -1.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [-0.5f32, 0.5f32, -0.5f32],
-            normal: Some([0.0f32, 0.0f32, -1.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [-0.5f32, -0.5f32, -0.5f32],
-            normal: Some([0.0f32, 0.0f32, -1.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [-0.5f32, -0.5f32, 0.5f32],
-            normal: Some([0.0f32, 0.0f32, 1.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [0.5f32, -0.5f32, 0.5f32],
-            normal: Some([0.0f32, 0.0f32, 1.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [0.5f32, 0.5f32, 0.5f32],
-            normal: Some([0.0f32, 0.0f32, 1.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [0.5f32, 0.5f32, 0.5f32],
-            normal: Some([0.0f32, 0.0f32, 1.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [-0.5f32, 0.5f32, 0.5f32],
-            normal: Some([0.0f32, 0.0f32, 1.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [-0.5f32, -0.5f32, 0.5f32],
-            normal: Some([0.0f32, 0.0f32, 1.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [-0.5f32, 0.5f32, 0.5f32],
-            normal: Some([-1.0f32, 0.0f32, 0.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [-0.5f32, 0.5f32, -0.5f32],
-            normal: Some([-1.0f32, 0.0f32, 0.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [-0.5f32, -0.5f32, -0.5f32],
-            normal: Some([-1.0f32, 0.0f32, 0.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [-0.5f32, -0.5f32, -0.5f32],
-            normal: Some([-1.0f32, 0.0f32, 0.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [-0.5f32, -0.5f32, 0.5f32],
-            normal: Some([-1.0f32, 0.0f32, 0.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [-0.5f32, 0.5f32, 0.5f32],
-            normal: Some([-1.0f32, 0.0f32, 0.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [0.5f32, 0.5f32, 0.5f32],
-            normal: Some([1.0f32, 0.0f32, 0.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [0.5f32, 0.5f32, -0.5f32],
-            normal: Some([1.0f32, 0.0f32, 0.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [0.5f32, -0.5f32, -0.5f32],
-            normal: Some([1.0f32, 0.0f32, 0.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [0.5f32, -0.5f32, -0.5f32],
-            normal: Some([1.0f32, 0.0f32, 0.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [0.5f32, -0.5f32, 0.5f32],
-            normal: Some([1.0f32, 0.0f32, 0.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [0.5f32, 0.5f32, 0.5f32],
-            normal: Some([1.0f32, 0.0f32, 0.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [-0.5f32, -0.5f32, -0.5f32],
-            normal: Some([0.0f32, -1.0f32, 0.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [0.5f32, -0.5f32, -0.5f32],
-            normal: Some([0.0f32, -1.0f32, 0.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [0.5f32, -0.5f32, 0.5f32],
-            normal: Some([0.0f32, -1.0f32, 0.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [0.5f32, -0.5f32, 0.5f32],
-            normal: Some([0.0f32, -1.0f32, 0.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [-0.5f32, -0.5f32, 0.5f32],
-            normal: Some([0.0f32, -1.0f32, 0.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [-0.5f32, -0.5f32, -0.5f32],
-            normal: Some([0.0f32, -1.0f32, 0.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [-0.5f32, 0.5f32, -0.5f32],
-            normal: Some([0.0f32, 1.0f32, 0.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [0.5f32, 0.5f32, -0.5f32],
-            normal: Some([0.0f32, 1.0f32, 0.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [0.5f32, 0.5f32, 0.5f32],
-            normal: Some([0.0f32, 1.0f32, 0.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [0.5f32, 0.5f32, 0.5f32],
-            normal: Some([0.0f32, 1.0f32, 0.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [-0.5f32, 0.5f32, 0.5f32],
-            normal: Some([0.0f32, 1.0f32, 0.0f32]),
-            color: None,
-        },
-        Vertex {
-            position: [-0.5f32, 0.5f32, -0.5f32],
-            normal: Some([0.0f32, 1.0f32, 0.0f32]),
-            color: None,
-        },
+    let vertices: Vec<[f32; 3]> = vec![
+        [-0.5, -0.5, -0.5],
+        [0.0, 0.0, -1.0],
+        [0.5, -0.5, -0.5],
+        [0.0, 0.0, -1.0],
+        [0.5, 0.5, -0.5],
+        [0.0, 0.0, -1.0],
+        [0.5, 0.5, -0.5],
+        [0.0, 0.0, -1.0],
+        [-0.5, 0.5, -0.5],
+        [0.0, 0.0, -1.0],
+        [-0.5, -0.5, -0.5],
+        [0.0, 0.0, -1.0],
+        [-0.5, -0.5, 0.5],
+        [0.0, 0.0, 1.0],
+        [0.5, -0.5, 0.5],
+        [0.0, 0.0, 1.0],
+        [0.5, 0.5, 0.5],
+        [0.0, 0.0, 1.0],
+        [0.5, 0.5, 0.5],
+        [0.0, 0.0, 1.0],
+        [-0.5, 0.5, 0.5],
+        [0.0, 0.0, 1.0],
+        [-0.5, -0.5, 0.5],
+        [0.0, 0.0, 1.0],
+        [-0.5, 0.5, 0.5],
+        [-1.0, 0.0, 0.0],
+        [-0.5, 0.5, -0.5],
+        [-1.0, 0.0, 0.0],
+        [-0.5, -0.5, -0.5],
+        [-1.0, 0.0, 0.0],
+        [-0.5, -0.5, -0.5],
+        [-1.0, 0.0, 0.0],
+        [-0.5, -0.5, 0.5],
+        [-1.0, 0.0, 0.0],
+        [-0.5, 0.5, 0.5],
+        [-1.0, 0.0, 0.0],
+        [0.5, 0.5, 0.5],
+        [1.0, 0.0, 0.0],
+        [0.5, 0.5, -0.5],
+        [1.0, 0.0, 0.0],
+        [0.5, -0.5, -0.5],
+        [1.0, 0.0, 0.0],
+        [0.5, -0.5, -0.5],
+        [1.0, 0.0, 0.0],
+        [0.5, -0.5, 0.5],
+        [1.0, 0.0, 0.0],
+        [0.5, 0.5, 0.5],
+        [1.0, 0.0, 0.0],
+        [-0.5, -0.5, -0.5],
+        [0.0, -1.0, 0.0],
+        [0.5, -0.5, -0.5],
+        [0.0, -1.0, 0.0],
+        [0.5, -0.5, 0.5],
+        [0.0, -1.0, 0.0],
+        [0.5, -0.5, 0.5],
+        [0.0, -1.0, 0.0],
+        [-0.5, -0.5, 0.5],
+        [0.0, -1.0, 0.0],
+        [-0.5, -0.5, -0.5],
+        [0.0, -1.0, 0.0],
+        [-0.5, 0.5, -0.5],
+        [0.0, 1.0, 0.0],
+        [0.5, 0.5, -0.5],
+        [0.0, 1.0, 0.0],
+        [0.5, 0.5, 0.5],
+        [0.0, 1.0, 0.0],
+        [0.5, 0.5, 0.5],
+        [0.0, 1.0, 0.0],
+        [-0.5, 0.5, 0.5],
+        [0.0, 1.0, 0.0],
+        [-0.5, 0.5, -0.5],
+        [0.0, 1.0, 0.0],
     ];
 
-    let obj = Entity::new(vertices.clone(), shader_program);
-    let light_source = Entity::new(vertices.clone(), shader_program_obj2);
+    let obj = Entity::new(
+        vertices.clone(),
+        Some(shader_program),
+        Some(vec![
+            Some(VertexAttribute::new(3, types::FLOAT, 4)),
+            None,
+            Some(VertexAttribute::new(3, types::FLOAT, 4)),
+        ]),
+    );
+    let light_source = Entity::new(
+        vertices.clone(),
+        Some(shader_program_obj2),
+        Some(vec![
+            Some(VertexAttribute::new(3, types::FLOAT, 4)),
+            None,
+            Some(VertexAttribute::new(3, types::FLOAT, 4)),
+        ]),
+    );
 
     let scene = Scene::new(vec![obj, light_source]);
     CTX.context.borrow_mut().scenes.push(scene);
 
-    CTX.context
-        .borrow_mut()
-        .set_clear_color(1.0f32, 1.0f32, 1.0f32, 1.0f32);
+    CTX.context.borrow_mut().set_clear_color(1.0, 1.0, 1.0, 1.0);
 
     let rotation_angle = 0.002;
     let mut rotation_amount = 0.0;
@@ -359,12 +267,18 @@ pub fn run() {
 
             current_scene.entities[0]
                 .shader
+                .as_ref()
+                .unwrap()
                 .set_uniform("u_model", rotation);
 
-            current_scene.entities[1].shader.set_uniform(
-                "u_model",
-                mat4_mat4_mul(light_source_model, light_source_rotation),
-            );
+            current_scene.entities[1]
+                .shader
+                .as_ref()
+                .unwrap()
+                .set_uniform(
+                    "u_model",
+                    mat4_mat4_mul(light_source_model, light_source_rotation),
+                );
         }
 
         rotation_amount += rotation_angle;

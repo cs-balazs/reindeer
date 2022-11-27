@@ -1,87 +1,97 @@
-use super::{lib, types, vertex::Vertex, RendererBackend, CTX};
+use super::{lib, types, vertex::Vertex, vertex_attribute::VertexAttribute, RendererBackend, CTX};
 
 #[derive(Debug, Clone)]
 pub struct Entity {
-    pub vertices: Vec<Vertex>,
+    pub vertices: Vec<f32>,
     pub vao: lib::Vao,
-    pub shader: lib::shader::Shader,
+    pub shader: Option<lib::shader::Shader>,
     /*
     pub transformations: Vec<Transformation> -> Transformation::Scale(0.2) or Transformation::Transalte(0.2, 0.0, 0.0), ...
     */
 }
 
 impl Entity {
-    pub fn new(vertices: Vec<Vertex>, shader: lib::shader::Shader) -> Entity {
+    pub fn new(
+        vertices: Vec<[f32; 3]>,
+        shader: Option<lib::shader::Shader>,
+        vertex_attributes: Option<Vec<Option<VertexAttribute>>>,
+    ) -> Entity {
         let ctx = &CTX.context.borrow();
         let vao = ctx.create_vertex_array();
         ctx.bind_vertex_array(&vao);
 
-        let buffer_data = vertices
-            .iter()
-            .flat_map(|v| {
-                let mut vec = vec![v.position[0], v.position[1], v.position[2]];
-
-                if let Some([r, g, b]) = v.color {
-                    vec.push(r);
-                    vec.push(g);
-                    vec.push(b);
-                }
-
-                if let Some([x, y, z]) = v.normal {
-                    vec.push(x);
-                    vec.push(y);
-                    vec.push(z);
-                }
-
-                vec
-            })
-            .collect::<Vec<f32>>();
+        let data = vertices.into_iter().flatten().collect();
 
         let buffer = ctx.create_buffer();
         ctx.bind_buffer(types::ARRAY_BUFFER, &buffer);
-        ctx.buffer_data(&buffer_data, types::ARRAY_BUFFER, types::STATIC_DRAW);
+        ctx.buffer_data(&data, types::ARRAY_BUFFER, types::STATIC_DRAW);
 
-        let stride = {
-            match &vertices.first() {
-                Some(first) => match (first.color, first.normal) {
-                    (Some(_), Some(_)) => 36,
-                    (Some(_), None) => 24,
-                    (None, Some(_)) => 24,
-                    _ => 0,
-                },
-                None => panic!("Expected at least one vertex"),
+        if let Some(attributes) = vertex_attributes {
+            let stride = attributes
+                .iter()
+                .map(|opt| {
+                    if opt.is_some() {
+                        (opt.as_ref().unwrap().count * &opt.as_ref().unwrap().item_size)
+                            .try_into()
+                            .expect("Calculating stride failed. Cast to i32 failed.")
+                    } else {
+                        0
+                    }
+                })
+                .sum();
+
+            let mut offset = 0;
+
+            for (index, attribute_options) in attributes.iter().enumerate() {
+                match attribute_options {
+                    Some(attribute) => {
+                        let ind = index
+                            .try_into()
+                            .expect("Vertex attribute index cast to u32 failed");
+
+                        ctx.enable_vertex_attrib_array(ind);
+                        ctx.vertex_attrib_pointer(
+                            ind,
+                            attribute
+                                .count
+                                .try_into()
+                                .expect("Vertex attribute count cast to i32 failed"),
+                            attribute.item_type,
+                            false, // TODO
+                            stride,
+                            offset,
+                        );
+
+                        let offset_increment: i32 =
+                            (attribute.count * attribute.item_size).try_into().expect(
+                                "Failed to increment vertex attribute offset. Cast to i32 failed.",
+                            );
+
+                        offset += offset_increment;
+                    }
+                    None => (),
+                }
             }
-        };
-
-        ctx.enable_vertex_attrib_array(0u32);
-        ctx.vertex_attrib_pointer(0u32, 3, types::FLOAT, false, stride, 0);
-
-        let color_offset = if vertices.first().and_then(|f| f.color).is_some() {
-            12
-        } else {
-            0
-        };
-
-        if color_offset > 0 {
-            ctx.enable_vertex_attrib_array(1u32);
-            ctx.vertex_attrib_pointer(1u32, 3, types::FLOAT, false, stride, color_offset);
-        }
-
-        if vertices.first().and_then(|f| f.normal).is_some() {
-            ctx.enable_vertex_attrib_array(2u32);
-            ctx.vertex_attrib_pointer(2u32, 3, types::FLOAT, false, stride, 12 + color_offset);
         }
 
         Entity {
-            vertices,
+            vertices: data,
             vao,
             shader,
         }
     }
 
     pub fn draw(&self, ctx: &lib::Context) {
-        ctx.use_program(&self.shader.id);
+        if let Some(shader) = &self.shader {
+            ctx.use_program(&shader.id);
+        }
         ctx.bind_vertex_array(&self.vao);
         ctx.draw_arrays(types::TRIANGLES, 0, self.vertices.len() as i32);
     }
+
+    pub fn bind_shader(&mut self, shader: lib::shader::Shader) {
+        self.shader = Some(shader);
+    }
+
+    pub fn push_vertex_attribute(&mut self, attribute: VertexAttribute) {}
 }
