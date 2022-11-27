@@ -1,6 +1,8 @@
 Cargo.lock
 target
 public/node_modules
+public/dist
+public/dist/*
 docs/node_modules
 public/wasm
 todo.md
