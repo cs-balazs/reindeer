@@ -8,6 +8,7 @@ pub struct Entity {
     /*
     pub transformations: Vec<Transformation> -> Transformation::Scale(0.2) or Transformation::Transalte(0.2, 0.0, 0.0), ...
     */
+    pub attributes: Option<Vec<Option<VertexAttribute>>>,
 }
 
 impl Entity {
@@ -26,7 +27,7 @@ impl Entity {
         ctx.bind_buffer(types::ARRAY_BUFFER, &buffer);
         ctx.buffer_data(&data, types::ARRAY_BUFFER, types::STATIC_DRAW);
 
-        if let Some(attributes) = vertex_attributes {
+        if let Some(attributes) = &vertex_attributes {
             let stride = attributes
                 .iter()
                 .map(|opt| {
@@ -78,6 +79,7 @@ impl Entity {
             vertices: data,
             vao,
             shader,
+            attributes: vertex_attributes,
         }
     }
 
@@ -86,7 +88,32 @@ impl Entity {
             ctx.use_program(&shader.id);
         }
         ctx.bind_vertex_array(&self.vao);
-        ctx.draw_arrays(types::TRIANGLES, 0, self.vertices.len() as i32);
+
+        let divide_vertex_count_by: usize = self
+            .attributes
+            .as_ref()
+            .and_then(|a| {
+                a.iter().fold(Some(0), |acc, item| {
+                    Some(
+                        acc.unwrap()
+                            + item
+                                .as_ref()
+                                .and_then(|attribute| Some(attribute.count))
+                                .unwrap_or(0),
+                    )
+                })
+            })
+            .unwrap_or(1)
+            .try_into()
+            .unwrap();
+
+        ctx.draw_arrays(
+            types::TRIANGLES,
+            0,
+            (self.vertices.len() / divide_vertex_count_by)
+                .try_into()
+                .unwrap(),
+        );
     }
 
     pub fn bind_shader(&mut self, shader: lib::shader::Shader) {
