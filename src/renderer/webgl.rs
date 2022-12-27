@@ -2,7 +2,6 @@ pub mod shader;
 
 use super::scene::Scene;
 use super::{RendererBackend, WINDOW_HEIGHT, WINDOW_WIDTH};
-use std::sync::Mutex;
 use std::{cell::RefCell, rc::Rc, vec};
 use wasm_bindgen::{prelude::Closure, JsCast};
 use web_sys::{
@@ -12,6 +11,7 @@ use web_sys::{
 
 pub struct Context {
     context: WebGl2RenderingContext,
+    #[allow(unused)]
     window: Window,
 
     pub scenes: Vec<Scene>,
@@ -64,21 +64,21 @@ impl RendererBackend for Context {
         shader::compile_program(name)
     }
 
-    fn use_program(&self, program: &WebGlProgram) -> () {
-        self.context.use_program(Some(&program))
+    fn use_program(&self, program: &WebGlProgram) {
+        self.context.use_program(Some(program))
     }
 
     fn create_buffer(&self) -> WebGlBuffer {
         self.context.create_buffer().unwrap()
     }
 
-    fn bind_buffer(&self, buffer_type: u32, buffer: &WebGlBuffer) -> () {
-        self.context.bind_buffer(buffer_type, Some(&buffer));
+    fn bind_buffer(&self, buffer_type: u32, buffer: &WebGlBuffer) {
+        self.context.bind_buffer(buffer_type, Some(buffer));
     }
 
-    fn buffer_data(&self, vertices: &Vec<f32>, buffer_type: u32, usage_hint: u32) -> () {
+    fn buffer_data(&self, vertices: &[f32], buffer_type: u32, usage_hint: u32) {
         unsafe {
-            let positions_array_buf_view = js_sys::Float32Array::view(&vertices);
+            let positions_array_buf_view = js_sys::Float32Array::view(vertices);
 
             self.context.buffer_data_with_array_buffer_view(
                 buffer_type,
@@ -92,8 +92,8 @@ impl RendererBackend for Context {
         self.context.create_vertex_array().unwrap()
     }
 
-    fn bind_vertex_array(&self, vao: &WebGlVertexArrayObject) -> () {
-        self.context.bind_vertex_array(Some(&vao))
+    fn bind_vertex_array(&self, vao: &WebGlVertexArrayObject) {
+        self.context.bind_vertex_array(Some(vao))
     }
 
     fn vertex_attrib_pointer(
@@ -104,24 +104,24 @@ impl RendererBackend for Context {
         normalized: bool,
         stride: i32,
         offset: i32,
-    ) -> () {
+    ) {
         self.context
             .vertex_attrib_pointer_with_i32(index, size, type_, normalized, stride, offset);
     }
 
-    fn enable_vertex_attrib_array(&self, index: u32) -> () {
+    fn enable_vertex_attrib_array(&self, index: u32) {
         self.context.enable_vertex_attrib_array(index);
     }
 
-    fn draw_arrays(&self, mode: u32, first: i32, vertex_count: i32) -> () {
+    fn draw_arrays(&self, mode: u32, first: i32, vertex_count: i32) {
         self.context.draw_arrays(mode, first, vertex_count);
     }
 
-    fn set_clear_color(&mut self, red: f32, green: f32, blue: f32, alpha: f32) -> () {
+    fn set_clear_color(&mut self, red: f32, green: f32, blue: f32, alpha: f32) {
         self.context.clear_color(red, green, blue, alpha);
     }
 
-    fn clear(&self) -> () {
+    fn clear(&self) {
         self.context.clear(
             WebGl2RenderingContext::COLOR_BUFFER_BIT | WebGl2RenderingContext::DEPTH_BUFFER_BIT,
         )

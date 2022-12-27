@@ -1,4 +1,4 @@
-use std::{collections::HashSet, ffi::CString};
+use std::collections::HashSet;
 
 use web_sys::{WebGl2RenderingContext, WebGlProgram, WebGlShader};
 
@@ -30,7 +30,7 @@ impl super::super::shader::Shader<[f32; 3]> for Shader {
             .borrow()
             .context
             .get_uniform_location(&self.id, name)
-            .expect(format!("Failed to find uniform location: {}", name).as_str());
+            .unwrap_or_else(|| panic!("Failed to find uniform location: {}", name));
         CTX.context.borrow().context.use_program(Some(&self.id));
         CTX.context
             .borrow()
@@ -46,7 +46,7 @@ impl super::super::shader::Shader<[[f32; 3]; 3]> for Shader {
             .borrow()
             .context
             .get_uniform_location(&self.id, name)
-            .expect(format!("Failed to find uniform location: {}", name).as_str());
+            .unwrap_or_else(|| panic!("Failed to find uniform location: {}", name));
         CTX.context.borrow().context.use_program(Some(&self.id));
 
         let input: [f32; 9] = [
@@ -74,7 +74,7 @@ impl super::super::shader::Shader<[[f32; 4]; 4]> for Shader {
             .borrow()
             .context
             .get_uniform_location(&self.id, name)
-            .expect(format!("Failed to find uniform location: {}", name).as_str());
+            .unwrap_or_else(|| panic!("Failed to find uniform location: {}", name));
         CTX.context.borrow().context.use_program(Some(&self.id));
 
         let input: [f32; 16] = [
