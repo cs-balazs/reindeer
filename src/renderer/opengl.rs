@@ -1,5 +1,5 @@
-use super::{Entity, RendererBackend, Scene, WINDOW_HEIGHT, WINDOW_WIDTH};
-use gl::types::{GLchar, GLfloat, GLsizeiptr};
+use super::{RendererBackend, Scene, WINDOW_HEIGHT, WINDOW_WIDTH};
+use gl::types::{GLfloat, GLsizeiptr};
 use glfw::{Context as GLFWContext, WindowEvent};
 use std::mem;
 use std::{ffi::c_void, sync::mpsc::Receiver};
@@ -9,6 +9,7 @@ pub mod shader;
 pub struct Context {
     glfw: glfw::Glfw,
     window: glfw::Window,
+    #[allow(unused)]
     events: Receiver<(f64, WindowEvent)>,
 
     pub scenes: Vec<Scene>,
@@ -88,11 +89,11 @@ impl RendererBackend for Context {
         buf
     }
 
-    fn bind_buffer(&self, buffer_type: u32, buffer: &Self::Buffer) -> () {
+    fn bind_buffer(&self, buffer_type: u32, buffer: &Self::Buffer) {
         unsafe { gl::BindBuffer(buffer_type, *buffer) }
     }
 
-    fn buffer_data(&self, vertices: &Vec<f32>, buffer_type: u32, usage_hint: u32) -> () {
+    fn buffer_data(&self, vertices: &[f32], buffer_type: u32, usage_hint: u32) {
         unsafe {
             gl::BufferData(
                 buffer_type,
@@ -103,15 +104,15 @@ impl RendererBackend for Context {
         }
     }
 
-    fn bind_vertex_array(&self, vao: &Self::Vao) -> () {
+    fn bind_vertex_array(&self, vao: &Self::Vao) {
         unsafe { gl::BindVertexArray(*vao) }
     }
 
-    fn clear(&self) -> () {
+    fn clear(&self) {
         unsafe { gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT) }
     }
 
-    fn set_clear_color(&mut self, red: f32, green: f32, blue: f32, alpha: f32) -> () {
+    fn set_clear_color(&mut self, red: f32, green: f32, blue: f32, alpha: f32) {
         unsafe { gl::ClearColor(red, green, blue, alpha) }
     }
 
@@ -121,15 +122,15 @@ impl RendererBackend for Context {
         vao
     }
 
-    fn draw_arrays(&self, mode: u32, first: i32, vertex_count: i32) -> () {
+    fn draw_arrays(&self, mode: u32, first: i32, vertex_count: i32) {
         unsafe { gl::DrawArrays(mode, first, vertex_count) }
     }
 
-    fn enable_vertex_attrib_array(&self, index: u32) -> () {
+    fn enable_vertex_attrib_array(&self, index: u32) {
         unsafe { gl::EnableVertexAttribArray(index) }
     }
 
-    fn use_program(&self, program: &Self::Program) -> () {
+    fn use_program(&self, program: &Self::Program) {
         unsafe { gl::UseProgram(*program) }
     }
 
@@ -141,7 +142,7 @@ impl RendererBackend for Context {
         normalized: bool,
         stride: i32,
         offset: i32,
-    ) -> () {
+    ) {
         unsafe {
             gl::VertexAttribPointer(
                 index,

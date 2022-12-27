@@ -47,6 +47,7 @@ pub fn mat4_mat4_mul(a: [[f32; 4]; 4], b: [[f32; 4]; 4]) -> [[f32; 4]; 4] {
     ]
 }
 
+#[allow(unused)]
 fn vec4_mat4_mul(vec4: [f32; 4], mat4: [[f32; 4]; 4]) -> [f32; 4] {
     [
         vec4[0] * mat4[0][0] + vec4[1] * mat4[1][0] + vec4[2] * mat4[2][0] + vec4[3] * mat4[3][0],

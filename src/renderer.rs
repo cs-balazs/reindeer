@@ -13,8 +13,8 @@ pub use webgl as lib;
 pub mod opengl;
 #[cfg(feature = "opengl")]
 use gl as types;
-#[cfg(feature = "opengl")]
-use glfw::Context;
+// #[cfg(feature = "opengl")]
+// use glfw::Context;
 #[cfg(feature = "opengl")]
 pub use opengl as lib;
 
@@ -30,12 +30,11 @@ mod vertex_attribute;
 use entity::Entity;
 use include_dir::{include_dir, Dir, DirEntry::File};
 use scene::Scene;
-use vertex::Vertex;
 use vertex_attribute::VertexAttribute;
 
 use crate::math::{get_rotation_matrix, get_scale_matrix, get_translation_matrix, mat4_mat4_mul};
 
-use self::{lib::Shader, shader::Shader as S};
+use self::shader::Shader as S;
 
 pub const WINDOW_WIDTH: u16 = 500;
 pub const WINDOW_HEIGHT: u16 = 500;
@@ -67,7 +66,7 @@ lazy_static! {
             if let File(f) = entry {
                 let name = f.path().to_str().unwrap();
                 let content = f.contents_utf8().unwrap();
-                map.insert(name.clone(), content.clone());
+                map.insert(<&str>::clone(&name), <&str>::clone(&content));
             } else {
                 panic!("SHADERS initialization failed");
             }
@@ -94,7 +93,7 @@ pub trait RendererBackend {
 
     fn bind_buffer(&self, buffer_type: u32, buffer: &Self::Buffer);
 
-    fn buffer_data(&self, vertices: &Vec<f32>, buffer_type: u32, usage_hint: u32);
+    fn buffer_data(&self, vertices: &[f32], buffer_type: u32, usage_hint: u32);
 
     fn create_vertex_array(&self) -> Self::Vao;
 
@@ -229,7 +228,7 @@ pub fn run() {
         ]),
     );
     let light_source = Entity::new(
-        vertices.clone(),
+        vertices,
         Some(shader_program_obj2),
         Some(vec![
             Some(VertexAttribute::new(3, types::FLOAT, 4)),

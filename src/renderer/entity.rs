@@ -1,4 +1,4 @@
-use super::{lib, types, vertex::Vertex, vertex_attribute::VertexAttribute, RendererBackend, CTX};
+use super::{lib, types, vertex_attribute::VertexAttribute, RendererBackend, CTX};
 
 #[derive(Debug, Clone)]
 pub struct Entity {
@@ -21,7 +21,7 @@ impl Entity {
         let vao = ctx.create_vertex_array();
         ctx.bind_vertex_array(&vao);
 
-        let data = vertices.into_iter().flatten().collect();
+        let data = vertices.into_iter().flatten().collect::<Vec<f32>>();
 
         let buffer = ctx.create_buffer();
         ctx.bind_buffer(types::ARRAY_BUFFER, &buffer);
@@ -32,7 +32,7 @@ impl Entity {
                 .iter()
                 .map(|opt| {
                     if opt.is_some() {
-                        (opt.as_ref().unwrap().count * &opt.as_ref().unwrap().item_size)
+                        (opt.as_ref().unwrap().count * opt.as_ref().unwrap().item_size)
                             .try_into()
                             .expect("Calculating stride failed. Cast to i32 failed.")
                     } else {
@@ -94,13 +94,7 @@ impl Entity {
             .as_ref()
             .and_then(|a| {
                 a.iter().fold(Some(0), |acc, item| {
-                    Some(
-                        acc.unwrap()
-                            + item
-                                .as_ref()
-                                .and_then(|attribute| Some(attribute.count))
-                                .unwrap_or(0),
-                    )
+                    Some(acc.unwrap() + item.as_ref().map(|attribute| attribute.count).unwrap_or(0))
                 })
             })
             .unwrap_or(1)
@@ -120,5 +114,5 @@ impl Entity {
         self.shader = Some(shader);
     }
 
-    pub fn push_vertex_attribute(&mut self, attribute: VertexAttribute) {}
+    pub fn push_vertex_attribute(&mut self, _attribute: VertexAttribute) {}
 }

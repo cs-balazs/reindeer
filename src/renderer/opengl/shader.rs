@@ -84,7 +84,7 @@ fn compile_shader(shader_type: u32, name: &str) -> Result<u32, String> {
     unsafe {
         let c_str = CString::new(shader_source.as_bytes()).unwrap();
         shader = gl::CreateShader(shader_type);
-        gl::ShaderSource(shader, 1, &c_str.as_ptr(), 0 as *const i32);
+        gl::ShaderSource(shader, 1, &c_str.as_ptr(), std::ptr::null::<i32>());
         gl::CompileShader(shader);
 
         // Get the compile status
@@ -96,7 +96,9 @@ fn compile_shader(shader_type: u32, name: &str) -> Result<u32, String> {
             let mut len = 0;
             gl::GetShaderiv(shader, gl::INFO_LOG_LENGTH, &mut len);
             let mut buf = Vec::with_capacity(len as usize);
+            buf.fill(0);
             buf.set_len((len as usize) - 1); // subtract 1 to skip the trailing null character
+
             gl::GetShaderInfoLog(
                 shader,
                 len,
@@ -105,9 +107,7 @@ fn compile_shader(shader_type: u32, name: &str) -> Result<u32, String> {
             );
             panic!(
                 "{}",
-                str::from_utf8(&buf)
-                    .ok()
-                    .expect("ShaderInfoLog not valid utf8")
+                str::from_utf8(&buf).expect("ShaderInfoLog not valid utf8")
             );
         }
     }
@@ -134,6 +134,7 @@ fn link_program(vertex_shader: u32, fragment_shader: u32) -> u32 {
             let mut len: GLint = 0;
             gl::GetProgramiv(program, gl::INFO_LOG_LENGTH, &mut len);
             let mut buf = Vec::with_capacity(len as usize);
+            buf.fill(0);
             buf.set_len((len as usize) - 1); // subtract 1 to skip the trailing null character
             gl::GetProgramInfoLog(
                 program,
@@ -143,9 +144,7 @@ fn link_program(vertex_shader: u32, fragment_shader: u32) -> u32 {
             );
             panic!(
                 "{}",
-                str::from_utf8(&buf)
-                    .ok()
-                    .expect("ProgramInfoLog not valid utf8")
+                str::from_utf8(&buf).expect("ProgramInfoLog not valid utf8")
             );
         }
     }
