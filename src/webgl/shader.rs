@@ -1,10 +1,10 @@
-use crate::{CTX, SHADERS};
+use crate::{backend::Backend, CTX, SHADERS};
 use std::collections::HashSet;
 use web_sys::{WebGl2RenderingContext, WebGlProgram, WebGlShader};
 
 #[derive(Debug, Clone)]
 pub struct Shader {
-    pub id: super::Program,
+    pub id: <super::Context as Backend>::Program,
     pub uniforms: HashSet<String>,
 }
 

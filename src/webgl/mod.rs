@@ -17,17 +17,12 @@ pub struct Context {
     pub scenes: Vec<Scene>,
 }
 
-pub type Buffer = WebGlBuffer;
-pub type Program = WebGlProgram;
-pub type Shader = WebGlShader;
-pub type Vao = WebGlVertexArrayObject;
-
 impl Backend for Context {
-    type Buffer = Buffer;
+    type Buffer = WebGlBuffer;
     type Context = Context;
-    type Program = Program;
-    type Shader = Shader;
-    type Vao = Vao;
+    type Program = WebGlProgram;
+    type Shader = WebGlShader;
+    type Vao = WebGlVertexArrayObject;
 
     fn new() -> Context {
         let window = web_sys::window().unwrap();

@@ -1,10 +1,10 @@
-use super::super::SHADERS;
+use crate::{backend::Backend, SHADERS};
 use gl::types::{GLchar, GLint};
 use std::{collections::HashSet, ffi::CString, ptr, str};
 
 #[derive(Debug, Clone)]
 pub struct Shader {
-    pub id: super::Program,
+    pub id: <super::Context as Backend>::Program,
     pub uniforms: HashSet<String>,
 }
 

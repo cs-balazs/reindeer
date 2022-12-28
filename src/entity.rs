@@ -5,7 +5,7 @@ use super::{backend::Backend, lib, types, vertex_attribute::VertexAttribute, CTX
 #[derive(Debug, Clone)]
 pub struct Entity {
     pub vertices: Vec<f32>,
-    pub vao: lib::Vao,
+    pub vao: <lib::Context as Backend>::Vao,
     pub shader: Option<lib::shader::Shader>,
     /*
     pub transformations: Vec<Transformation> -> Transformation::Scale(0.2) or Transformation::Transalte(0.2, 0.0, 0.0), ...

@@ -15,17 +15,12 @@ pub struct Context {
     pub scenes: Vec<Scene>,
 }
 
-pub type Buffer = u32;
-pub type Program = u32;
-pub type Shader = u32;
-pub type Vao = u32;
-
 impl Backend for Context {
     type Context = Context;
-    type Buffer = Buffer;
-    type Program = Program;
-    type Shader = Shader;
-    type Vao = Vao;
+    type Buffer = u32;
+    type Program = u32;
+    type Shader = u32;
+    type Vao = u32;
 
     fn new() -> Self::Context {
         let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).expect("Failed to initialize window.");
