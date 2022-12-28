@@ -20,7 +20,6 @@ version = "0.3.60"
 optional = true
 features = [
   'Document',
-  'Element',
   'HtmlCanvasElement',
   'WebGlBuffer',
   'WebGlVertexArrayObject',

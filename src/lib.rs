@@ -26,7 +26,6 @@ pub use opengl as lib;
 mod entity;
 mod scene;
 mod shader;
-mod vertex;
 mod vertex_attribute;
 
 use self::shader::Shader as S;
