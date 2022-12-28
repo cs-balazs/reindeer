@@ -1,3 +1,5 @@
+use crate::common::Vec3;
+
 use super::{lib, types, vertex_attribute::VertexAttribute, RendererBackend, CTX};
 
 #[derive(Debug, Clone)]
@@ -13,7 +15,7 @@ pub struct Entity {
 
 impl Entity {
     pub fn new(
-        vertices: Vec<[f32; 3]>,
+        vertices: Vec<Vec3>,
         shader: Option<lib::shader::Shader>,
         vertex_attributes: Option<Vec<Option<VertexAttribute>>>,
     ) -> Entity {

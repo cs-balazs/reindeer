@@ -24,17 +24,15 @@ mod shader;
 mod vertex;
 mod vertex_attribute;
 
-// ((?:-| )[0-9]\.[0-9]f32), ((?:-| )[0-9]\.[0-9]f32), ((?:-| )[0-9]\.[0-9]f32), ((?:-| )[0-9]\.[0-9]f32), ((?:-| )[0-9]\.[0-9]f32), ((?:-| )[0-9]\.[0-9]f32)
-// Vertex { position: [$1, $2, $3], normal:  Some([$4, $5, $6]), color: None }
-
+use self::shader::Shader as S;
+use crate::{
+    common::Vec3,
+    math::{get_rotation_matrix, get_scale_matrix, get_translation_matrix, mat4_mat4_mul},
+};
 use entity::Entity;
 use include_dir::{include_dir, Dir, DirEntry::File};
 use scene::Scene;
 use vertex_attribute::VertexAttribute;
-
-use crate::math::{get_rotation_matrix, get_scale_matrix, get_translation_matrix, mat4_mat4_mul};
-
-use self::shader::Shader as S;
 
 pub const WINDOW_WIDTH: u16 = 500;
 pub const WINDOW_HEIGHT: u16 = 500;
@@ -143,7 +141,7 @@ pub fn run() {
     let shader_program_obj2 = lib::shader::Shader::new("uniform_color");
     shader_program_obj2.set_uniform("u_color", light_color);
 
-    let vertices: Vec<[f32; 3]> = vec![
+    let vertices: Vec<Vec3> = vec![
         [-0.5, -0.5, -0.5],
         [0.0, 0.0, -1.0],
         [0.5, -0.5, -0.5],
