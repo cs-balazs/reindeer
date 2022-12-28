@@ -1,7 +1,7 @@
 pub mod shader;
 
 use super::scene::Scene;
-use super::{RendererBackend, WINDOW_HEIGHT, WINDOW_WIDTH};
+use super::{backend::Backend, WINDOW_HEIGHT, WINDOW_WIDTH};
 use std::{cell::RefCell, rc::Rc, vec};
 use wasm_bindgen::{prelude::Closure, JsCast};
 use web_sys::{
@@ -22,7 +22,7 @@ pub type Program = WebGlProgram;
 pub type Shader = WebGlShader;
 pub type Vao = WebGlVertexArrayObject;
 
-impl RendererBackend for Context {
+impl Backend for Context {
     type Buffer = Buffer;
     type Context = Context;
     type Program = Program;

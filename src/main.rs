@@ -1,5 +1,5 @@
-use reindeer::renderer;
+use reindeer;
 
 fn main() {
-    renderer::run();
+    reindeer::run();
 }

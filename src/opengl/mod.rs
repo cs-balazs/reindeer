@@ -1,4 +1,4 @@
-use super::{RendererBackend, Scene, WINDOW_HEIGHT, WINDOW_WIDTH};
+use super::{backend::Backend, Scene, WINDOW_HEIGHT, WINDOW_WIDTH};
 use gl::types::{GLfloat, GLsizeiptr};
 use glfw::{Context as GLFWContext, WindowEvent};
 use std::mem;
@@ -20,7 +20,7 @@ pub type Program = u32;
 pub type Shader = u32;
 pub type Vao = u32;
 
-impl RendererBackend for Context {
+impl Backend for Context {
     type Context = Context;
     type Buffer = Buffer;
     type Program = Program;

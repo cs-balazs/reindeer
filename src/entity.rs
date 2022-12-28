@@ -1,6 +1,6 @@
 use crate::common::Vec3;
 
-use super::{lib, types, vertex_attribute::VertexAttribute, RendererBackend, CTX};
+use super::{backend::Backend, lib, types, vertex_attribute::VertexAttribute, CTX};
 
 #[derive(Debug, Clone)]
 pub struct Entity {
