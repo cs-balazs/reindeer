@@ -25,15 +25,15 @@ pub use opengl as lib;
 
 mod entity;
 mod scene;
-mod shader;
 mod vertex_attribute;
 
-use self::shader::Shader as S;
+use crate::common::Shader;
 use crate::{
     backend::Backend,
     common::Vec3,
     math::{get_rotation_matrix, get_scale_matrix, get_translation_matrix, mat4_mat4_mul},
 };
+use common::ShaderProgram;
 use entity::Entity;
 use include_dir::{include_dir, Dir, DirEntry::File};
 use scene::Scene;
@@ -88,13 +88,13 @@ pub fn run() {
     let light_color = [0.5, 0.5, 1.0];
     let object_color = [1.0, 0.5, 0.5];
 
-    let shader_program = lib::shader::Shader::new("phong_light_object");
+    let shader_program = ShaderProgram::new("phong_light_object");
     shader_program.set_uniform("u_color", object_color);
     shader_program.set_uniform("u_light_color", light_color);
     shader_program.set_uniform("u_light_position", light_position);
     shader_program.set_uniform("u_camera_position", [0.0, 0.0, -1.0]);
 
-    let shader_program_obj2 = lib::shader::Shader::new("uniform_color");
+    let shader_program_obj2 = ShaderProgram::new("uniform_color");
     shader_program_obj2.set_uniform("u_color", light_color);
 
     let vertices: Vec<Vec3> = vec![

@@ -1,27 +1,12 @@
-use crate::{backend::Backend, SHADERS};
+use crate::{
+    backend::Backend,
+    common::{Shader, ShaderProgram, ShaderUtils},
+    SHADERS,
+};
 use gl::types::{GLchar, GLint};
-use std::{collections::HashSet, ffi::CString, ptr, str};
+use std::{ffi::CString, ptr, str};
 
-#[derive(Debug, Clone)]
-pub struct Shader {
-    pub id: <super::Context as Backend>::Program,
-    pub uniforms: HashSet<String>,
-}
-
-impl Shader {
-    pub fn new(name: &str) -> Shader {
-        let id = compile_program(name);
-
-        // TODO: Parse uniform names in Shader.uniforms
-
-        Shader {
-            id,
-            uniforms: HashSet::new(),
-        }
-    }
-}
-
-impl super::super::shader::Shader<[f32; 3]> for Shader {
+impl Shader<[f32; 3]> for ShaderProgram {
     fn set_uniform(&self, name: &str, input: [f32; 3]) {
         let loc: i32;
 
@@ -34,7 +19,7 @@ impl super::super::shader::Shader<[f32; 3]> for Shader {
     }
 }
 
-impl super::super::shader::Shader<[[f32; 3]; 3]> for Shader {
+impl Shader<[[f32; 3]; 3]> for ShaderProgram {
     fn set_uniform(&self, name: &str, input: [[f32; 3]; 3]) {
         let loc: i32;
 
@@ -47,7 +32,7 @@ impl super::super::shader::Shader<[[f32; 3]; 3]> for Shader {
     }
 }
 
-impl super::super::shader::Shader<[[f32; 4]; 4]> for Shader {
+impl Shader<[[f32; 4]; 4]> for ShaderProgram {
     fn set_uniform(&self, name: &str, input: [[f32; 4]; 4]) {
         let loc: i32;
 
@@ -60,11 +45,15 @@ impl super::super::shader::Shader<[[f32; 4]; 4]> for Shader {
     }
 }
 
-pub fn compile_program(name: &str) -> u32 {
-    let fragment_shader = compile_shader(gl::FRAGMENT_SHADER, name).unwrap();
-    let vertex_shader = compile_shader(gl::VERTEX_SHADER, name).unwrap();
+pub struct ShaderLib;
 
-    link_program(vertex_shader, fragment_shader)
+impl ShaderUtils for ShaderLib {
+    fn compile_program(name: &str) -> <super::Context as Backend>::Program {
+        let fragment_shader = compile_shader(gl::FRAGMENT_SHADER, name).unwrap();
+        let vertex_shader = compile_shader(gl::VERTEX_SHADER, name).unwrap();
+
+        link_program(vertex_shader, fragment_shader)
+    }
 }
 
 fn compile_shader(shader_type: u32, name: &str) -> Result<u32, String> {

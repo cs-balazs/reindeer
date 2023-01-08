@@ -1,27 +1,11 @@
-use crate::{backend::Backend, CTX, SHADERS};
-use std::collections::HashSet;
+use crate::{
+    backend::Backend,
+    common::{Shader, ShaderProgram, ShaderUtils},
+    CTX, SHADERS,
+};
 use web_sys::{WebGl2RenderingContext, WebGlProgram, WebGlShader};
 
-#[derive(Debug, Clone)]
-pub struct Shader {
-    pub id: <super::Context as Backend>::Program,
-    pub uniforms: HashSet<String>,
-}
-
-impl Shader {
-    pub fn new(name: &str) -> Shader {
-        let id = compile_program(name);
-
-        // TODO: Parse uniform names in Shader.uniforms
-
-        Shader {
-            id,
-            uniforms: HashSet::new(),
-        }
-    }
-}
-
-impl super::super::shader::Shader<[f32; 3]> for Shader {
+impl Shader<[f32; 3]> for ShaderProgram {
     fn set_uniform(&self, name: &str, input: [f32; 3]) {
         let loc = CTX
             .context
@@ -37,7 +21,7 @@ impl super::super::shader::Shader<[f32; 3]> for Shader {
     }
 }
 
-impl super::super::shader::Shader<[[f32; 3]; 3]> for Shader {
+impl Shader<[[f32; 3]; 3]> for ShaderProgram {
     fn set_uniform(&self, name: &str, input: [[f32; 3]; 3]) {
         let loc = CTX
             .context
@@ -65,7 +49,7 @@ impl super::super::shader::Shader<[[f32; 3]; 3]> for Shader {
     }
 }
 
-impl super::super::shader::Shader<[[f32; 4]; 4]> for Shader {
+impl Shader<[[f32; 4]; 4]> for ShaderProgram {
     fn set_uniform(&self, name: &str, input: [[f32; 4]; 4]) {
         let loc = CTX
             .context
@@ -100,14 +84,18 @@ impl super::super::shader::Shader<[[f32; 4]; 4]> for Shader {
     }
 }
 
-pub fn compile_program(name: &str) -> WebGlProgram {
-    let fragment_shader = compile_shader(WebGl2RenderingContext::FRAGMENT_SHADER, name)
-        .expect("Compiling fragmet shader failed");
+pub struct ShaderLib;
 
-    let vertex_shader = compile_shader(WebGl2RenderingContext::VERTEX_SHADER, name)
-        .expect("Compiling vertex shader failed");
+impl ShaderUtils for ShaderLib {
+    fn compile_program(name: &str) -> <super::Context as Backend>::Program {
+        let fragment_shader = compile_shader(WebGl2RenderingContext::FRAGMENT_SHADER, name)
+            .expect("Compiling fragmet shader failed");
 
-    link_program(&vertex_shader, &fragment_shader)
+        let vertex_shader = compile_shader(WebGl2RenderingContext::VERTEX_SHADER, name)
+            .expect("Compiling vertex shader failed");
+
+        link_program(&vertex_shader, &fragment_shader)
+    }
 }
 
 fn compile_shader(shader_type: u32, name: &str) -> Result<WebGlShader, String> {

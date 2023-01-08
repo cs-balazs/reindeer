@@ -1,12 +1,11 @@
-use crate::common::Vec3;
-
 use super::{backend::Backend, lib, types, vertex_attribute::VertexAttribute, CTX};
+use crate::common::{ShaderProgram, Vec3};
 
 #[derive(Debug, Clone)]
 pub struct Entity {
     pub vertices: Vec<f32>,
     pub vao: <lib::Context as Backend>::Vao,
-    pub shader: Option<lib::shader::Shader>,
+    pub shader: Option<ShaderProgram>,
     /*
     pub transformations: Vec<Transformation> -> Transformation::Scale(0.2) or Transformation::Transalte(0.2, 0.0, 0.0), ...
     */
@@ -16,7 +15,7 @@ pub struct Entity {
 impl Entity {
     pub fn new(
         vertices: Vec<Vec3>,
-        shader: Option<lib::shader::Shader>,
+        shader: Option<ShaderProgram>,
         vertex_attributes: Option<Vec<Option<VertexAttribute>>>,
     ) -> Entity {
         let ctx = &CTX.context.borrow();
@@ -112,7 +111,7 @@ impl Entity {
         );
     }
 
-    pub fn bind_shader(&mut self, shader: lib::shader::Shader) {
+    pub fn bind_shader(&mut self, shader: ShaderProgram) {
         self.shader = Some(shader);
     }
 

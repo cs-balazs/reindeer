@@ -2,6 +2,7 @@ pub mod shader;
 
 use super::scene::Scene;
 use super::{backend::Backend, WINDOW_HEIGHT, WINDOW_WIDTH};
+use crate::common::ShaderUtils;
 use std::{cell::RefCell, rc::Rc, vec};
 use wasm_bindgen::{prelude::Closure, JsCast};
 use web_sys::{
@@ -56,7 +57,7 @@ impl Backend for Context {
     }
 
     fn compile_program(&self, name: &str) -> Self::Program {
-        shader::compile_program(name)
+        shader::ShaderLib::compile_program(name)
     }
 
     fn use_program(&self, program: &WebGlProgram) {

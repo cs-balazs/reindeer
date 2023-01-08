@@ -1,4 +1,5 @@
 use super::{backend::Backend, Scene, WINDOW_HEIGHT, WINDOW_WIDTH};
+use crate::common::ShaderUtils;
 use gl::types::{GLfloat, GLsizeiptr};
 use glfw::{Context as GLFWContext, WindowEvent};
 use std::mem;
@@ -93,7 +94,7 @@ impl Backend for Context {
             gl::BufferData(
                 buffer_type,
                 (vertices.len() * mem::size_of::<GLfloat>()) as GLsizeiptr,
-                mem::transmute(&vertices[0]),
+                &vertices[0] as *const f32 as *const std::ffi::c_void,
                 usage_hint,
             )
         }
@@ -143,7 +144,7 @@ impl Backend for Context {
                 index,
                 size,
                 type_,
-                if normalized { 1u8 } else { 0u8 },
+                u8::from(normalized),
                 stride,
                 offset as *const c_void,
             )
@@ -151,7 +152,7 @@ impl Backend for Context {
     }
 
     fn compile_program(&self, name: &str) -> Self::Program {
-        shader::compile_program(name)
+        shader::ShaderLib::compile_program(name)
     }
 
     fn should_close(&self) -> bool {
