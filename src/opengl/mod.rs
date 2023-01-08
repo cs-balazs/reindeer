@@ -24,21 +24,11 @@ impl Backend for Context {
 
     fn new() -> Self::Context {
         let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).expect("Failed to initialize window.");
-        // glfw.window_hint(glfw::WindowHint::ContextVersion(3, 2));
-        // glfw.window_hint(glfw::WindowHint::OpenGlForwardCompat(true));
-        // glfw.window_hint(glfw::WindowHint::OpenGlProfile(
-        //     glfw::OpenGlProfileHint::Core,
-        // ));
-
         #[cfg(target_os = "macos")]
-        glfw.window_hint(glfw::WindowHint::ContextVersionMajor(4));
-        #[cfg(target_os = "macos")]
-        glfw.window_hint(glfw::WindowHint::ContextVersionMinor(1));
+        glfw.window_hint(glfw::WindowHint::ContextVersion(4, 1));
 
         #[cfg(not(target_os = "macos"))]
-        glfw.window_hint(glfw::WindowHint::ContextVersionMajor(4));
-        #[cfg(not(target_os = "macos"))]
-        glfw.window_hint(glfw::WindowHint::ContextVersionMinor(6));
+        glfw.window_hint(glfw::WindowHint::ContextVersion(4, 6));
 
         glfw.window_hint(glfw::WindowHint::Resizable(false));
         glfw.window_hint(glfw::WindowHint::OpenGlProfile(
