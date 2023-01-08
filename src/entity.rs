@@ -1,5 +1,5 @@
-use super::{backend::Backend, lib, types, vertex_attribute::VertexAttribute, CTX};
-use crate::common::{ShaderProgram, Vec3};
+use super::{backend::Backend, lib, types, CTX};
+use crate::common::{ShaderProgram, Vec3, VertexAttribute};
 
 #[derive(Debug, Clone)]
 pub struct Entity {

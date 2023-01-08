@@ -25,7 +25,6 @@ pub use opengl as lib;
 
 mod entity;
 mod scene;
-mod vertex_attribute;
 
 use crate::common::Shader;
 use crate::{
@@ -33,12 +32,11 @@ use crate::{
     common::Vec3,
     math::{get_rotation_matrix, get_scale_matrix, get_translation_matrix, mat4_mat4_mul},
 };
-use common::ShaderProgram;
+use common::{ShaderProgram, VERTEX_ATTRIBUTE_FVEC3};
 use entity::Entity;
 use include_dir::{include_dir, Dir, DirEntry::File};
 use scene::Scene;
 use std::{cell::RefCell, collections::HashMap, str};
-use vertex_attribute::VertexAttribute;
 
 pub const WINDOW_WIDTH: u16 = 500;
 pub const WINDOW_HEIGHT: u16 = 500;
@@ -176,18 +174,18 @@ pub fn run() {
         vertices.clone(),
         Some(shader_program),
         Some(vec![
-            Some(VertexAttribute::new(3, types::FLOAT, 4)),
+            Some(VERTEX_ATTRIBUTE_FVEC3),
             None,
-            Some(VertexAttribute::new(3, types::FLOAT, 4)),
+            Some(VERTEX_ATTRIBUTE_FVEC3),
         ]),
     );
     let light_source = Entity::new(
         vertices,
         Some(shader_program_obj2),
         Some(vec![
-            Some(VertexAttribute::new(3, types::FLOAT, 4)),
+            Some(VERTEX_ATTRIBUTE_FVEC3),
             None,
-            Some(VertexAttribute::new(3, types::FLOAT, 4)),
+            Some(VERTEX_ATTRIBUTE_FVEC3),
         ]),
     );
 
