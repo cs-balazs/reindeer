@@ -5,8 +5,6 @@ pub trait Backend {
     type Buffer;
     type Vao;
 
-    fn compile_program(&self, name: &str) -> Self::Program;
-
     fn new() -> Self::Context;
 
     fn use_program(&self, program: &Self::Program);
@@ -38,8 +36,6 @@ pub trait Backend {
     fn set_clear_color(&mut self, red: f32, green: f32, blue: f32, alpha: f32);
 
     fn clear(&self);
-
-    fn should_close(&self) -> bool;
 
     fn before_draw(&mut self);
 

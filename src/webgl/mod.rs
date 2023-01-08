@@ -2,7 +2,6 @@ pub mod shader;
 
 use super::scene::Scene;
 use super::{backend::Backend, WINDOW_HEIGHT, WINDOW_WIDTH};
-use crate::common::ShaderUtils;
 use std::{cell::RefCell, rc::Rc, vec};
 use wasm_bindgen::{prelude::Closure, JsCast};
 use web_sys::{
@@ -54,10 +53,6 @@ impl Backend for Context {
             window,
             scenes: vec![],
         }
-    }
-
-    fn compile_program(&self, name: &str) -> Self::Program {
-        shader::ShaderLib::compile_program(name)
     }
 
     fn use_program(&self, program: &WebGlProgram) {
@@ -121,10 +116,6 @@ impl Backend for Context {
         self.context.clear(
             WebGl2RenderingContext::COLOR_BUFFER_BIT | WebGl2RenderingContext::DEPTH_BUFFER_BIT,
         )
-    }
-
-    fn should_close(&self) -> bool {
-        false
     }
 
     fn before_draw(&mut self) {

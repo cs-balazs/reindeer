@@ -1,5 +1,4 @@
 use super::{backend::Backend, Scene, WINDOW_HEIGHT, WINDOW_WIDTH};
-use crate::common::ShaderUtils;
 use gl::types::{GLfloat, GLsizeiptr};
 use glfw::{Context as GLFWContext, WindowEvent};
 use std::mem;
@@ -149,14 +148,6 @@ impl Backend for Context {
                 offset as *const c_void,
             )
         }
-    }
-
-    fn compile_program(&self, name: &str) -> Self::Program {
-        shader::ShaderLib::compile_program(name)
-    }
-
-    fn should_close(&self) -> bool {
-        self.window.should_close()
     }
 
     fn before_draw(&mut self) {
