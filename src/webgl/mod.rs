@@ -1,6 +1,5 @@
 pub mod shader;
 
-use super::scene::Scene;
 use super::{backend::Backend, WINDOW_HEIGHT, WINDOW_WIDTH};
 use std::{cell::RefCell, rc::Rc, vec};
 use wasm_bindgen::{prelude::Closure, JsCast};
@@ -13,8 +12,6 @@ pub struct Context {
     context: WebGl2RenderingContext,
     #[allow(unused)]
     window: Window,
-
-    pub scenes: Vec<Scene>,
 }
 
 impl Backend for Context {
@@ -48,11 +45,7 @@ impl Backend for Context {
 
         context.enable(WebGl2RenderingContext::DEPTH_TEST);
 
-        Context {
-            context,
-            window,
-            scenes: vec![],
-        }
+        Context { context, window }
     }
 
     fn use_program(&self, program: &WebGlProgram) {

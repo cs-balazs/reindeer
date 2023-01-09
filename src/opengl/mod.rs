@@ -1,4 +1,4 @@
-use super::{backend::Backend, Scene, WINDOW_HEIGHT, WINDOW_WIDTH};
+use super::{backend::Backend, WINDOW_HEIGHT, WINDOW_WIDTH};
 use gl::types::{GLfloat, GLsizeiptr};
 use glfw::{Context as GLFWContext, WindowEvent};
 use std::mem;
@@ -11,8 +11,6 @@ pub struct Context {
     window: glfw::Window,
     #[allow(unused)]
     events: Receiver<(f64, WindowEvent)>,
-
-    pub scenes: Vec<Scene>,
 }
 
 impl Backend for Context {
@@ -64,7 +62,6 @@ impl Backend for Context {
             glfw,
             window,
             events,
-            scenes: vec![],
         }
     }
 

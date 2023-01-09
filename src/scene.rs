@@ -1,18 +1,15 @@
-use super::entity::Entity;
-use super::lib;
+use crate::BACKEND;
 
-pub struct Scene {
-    pub entities: Vec<Entity>,
+use super::entity::Entity;
+
+pub trait Drawable {
+    fn draw(&self);
 }
 
-impl Scene {
-    pub fn new(entities: Vec<Entity>) -> Scene {
-        Scene { entities }
-    }
-
-    pub fn draw(&self, ctx: &lib::Context) {
-        for entity in &self.entities {
-            entity.draw(ctx);
+impl Drawable for Vec<Entity> {
+    fn draw(&self) {
+        for entity in self {
+            entity.draw(&BACKEND.lock().unwrap()); // TODO: This should be BACNEKD.draw(entity) instead....
         }
     }
 }

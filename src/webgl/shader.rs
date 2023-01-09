@@ -1,21 +1,22 @@
 use crate::{
     backend::Backend,
     common::{Shader, ShaderProgram, ShaderUtils},
-    CTX, SHADERS,
+    BACKEND, SHADERS,
 };
 use web_sys::{WebGl2RenderingContext, WebGlProgram, WebGlShader};
 
 impl Shader<[f32; 3]> for ShaderProgram {
     fn set_uniform(&self, name: &str, input: [f32; 3]) {
-        let loc = CTX
-            .context
-            .borrow()
+        let loc = BACKEND
+            .lock()
+            .unwrap()
             .context
             .get_uniform_location(&self.id, name)
             .unwrap_or_else(|| panic!("Failed to find uniform location: {}", name));
-        CTX.context.borrow().context.use_program(Some(&self.id));
-        CTX.context
-            .borrow()
+        BACKEND.lock().unwrap().context.use_program(Some(&self.id));
+        BACKEND
+            .lock()
+            .unwrap()
             .context
             .uniform3f(Some(&loc), input[0], input[1], input[2]);
     }
@@ -23,13 +24,13 @@ impl Shader<[f32; 3]> for ShaderProgram {
 
 impl Shader<[[f32; 3]; 3]> for ShaderProgram {
     fn set_uniform(&self, name: &str, input: [[f32; 3]; 3]) {
-        let loc = CTX
-            .context
-            .borrow()
+        let loc = BACKEND
+            .lock()
+            .unwrap()
             .context
             .get_uniform_location(&self.id, name)
             .unwrap_or_else(|| panic!("Failed to find uniform location: {}", name));
-        CTX.context.borrow().context.use_program(Some(&self.id));
+        BACKEND.lock().unwrap().context.use_program(Some(&self.id));
 
         let input: [f32; 9] = [
             input[0][0],
@@ -42,8 +43,9 @@ impl Shader<[[f32; 3]; 3]> for ShaderProgram {
             input[2][1],
             input[2][2],
         ];
-        CTX.context
-            .borrow()
+        BACKEND
+            .lock()
+            .unwrap()
             .context
             .uniform_matrix3fv_with_f32_array(Some(&loc), false, &input);
     }
@@ -51,13 +53,13 @@ impl Shader<[[f32; 3]; 3]> for ShaderProgram {
 
 impl Shader<[[f32; 4]; 4]> for ShaderProgram {
     fn set_uniform(&self, name: &str, input: [[f32; 4]; 4]) {
-        let loc = CTX
-            .context
-            .borrow()
+        let loc = BACKEND
+            .lock()
+            .unwrap()
             .context
             .get_uniform_location(&self.id, name)
             .unwrap_or_else(|| panic!("Failed to find uniform location: {}", name));
-        CTX.context.borrow().context.use_program(Some(&self.id));
+        BACKEND.lock().unwrap().context.use_program(Some(&self.id));
 
         let input: [f32; 16] = [
             input[0][0],
@@ -77,8 +79,9 @@ impl Shader<[[f32; 4]; 4]> for ShaderProgram {
             input[3][2],
             input[3][3],
         ];
-        CTX.context
-            .borrow()
+        BACKEND
+            .lock()
+            .unwrap()
             .context
             .uniform_matrix4fv_with_f32_array(Some(&loc), false, &input);
     }
@@ -110,22 +113,23 @@ fn compile_shader(shader_type: u32, name: &str) -> Result<WebGlShader, String> {
     )
     .as_str()];
 
-    let shader = CTX
-        .context
-        .borrow()
+    let shader = BACKEND
+        .lock()
+        .unwrap()
         .context
         .create_shader(shader_type)
         .ok_or_else(|| String::from("Unable to create shader object"))?;
 
-    CTX.context
-        .borrow()
+    BACKEND
+        .lock()
+        .unwrap()
         .context
         .shader_source(&shader, shader_source);
-    CTX.context.borrow().context.compile_shader(&shader);
+    BACKEND.lock().unwrap().context.compile_shader(&shader);
 
-    if CTX
-        .context
-        .borrow()
+    if BACKEND
+        .lock()
+        .unwrap()
         .context
         .get_shader_parameter(&shader, WebGl2RenderingContext::COMPILE_STATUS)
         .as_bool()
@@ -133,15 +137,15 @@ fn compile_shader(shader_type: u32, name: &str) -> Result<WebGlShader, String> {
     {
         Ok(shader)
     } else {
-        if let Some(err) = CTX.context.borrow().context.get_shader_info_log(&shader) {
+        if let Some(err) = BACKEND.lock().unwrap().context.get_shader_info_log(&shader) {
             let array = js_sys::Array::new();
             array.push(&err.into());
             web_sys::console::log(&array);
         }
 
-        Err(CTX
-            .context
-            .borrow()
+        Err(BACKEND
+            .lock()
+            .unwrap()
             .context
             .get_shader_info_log(&shader)
             .unwrap_or_else(|| String::from("Unknown error creating shader")))
@@ -149,17 +153,19 @@ fn compile_shader(shader_type: u32, name: &str) -> Result<WebGlShader, String> {
 }
 
 fn link_program(vertex_shader: &WebGlShader, fragment_shader: &WebGlShader) -> WebGlProgram {
-    let program = CTX.context.borrow().context.create_program().unwrap();
+    let program = BACKEND.lock().unwrap().context.create_program().unwrap();
 
-    CTX.context
-        .borrow()
+    BACKEND
+        .lock()
+        .unwrap()
         .context
         .attach_shader(&program, vertex_shader);
-    CTX.context
-        .borrow()
+    BACKEND
+        .lock()
+        .unwrap()
         .context
         .attach_shader(&program, fragment_shader);
-    CTX.context.borrow().context.link_program(&program);
+    BACKEND.lock().unwrap().context.link_program(&program);
 
     program
 }

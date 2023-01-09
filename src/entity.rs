@@ -1,5 +1,8 @@
-use super::{backend::Backend, lib, types, CTX};
-use crate::common::{ShaderProgram, Vec3, VertexAttribute};
+use super::{backend::Backend, lib, types};
+use crate::{
+    common::{ShaderProgram, Vec3, VertexAttribute},
+    BACKEND,
+};
 
 #[derive(Debug, Clone)]
 pub struct Entity {
@@ -14,19 +17,25 @@ pub struct Entity {
 
 impl Entity {
     pub fn new(
+        // ctx: &lib::Context,
         vertices: Vec<Vec3>,
         shader: Option<ShaderProgram>,
         vertex_attributes: Option<Vec<Option<VertexAttribute>>>,
     ) -> Entity {
-        let ctx = &CTX.context.borrow();
-        let vao = ctx.create_vertex_array();
-        ctx.bind_vertex_array(&vao);
+        let vao = BACKEND.lock().unwrap().create_vertex_array();
+        BACKEND.lock().unwrap().bind_vertex_array(&vao);
 
         let data = vertices.into_iter().flatten().collect::<Vec<f32>>();
 
-        let buffer = ctx.create_buffer();
-        ctx.bind_buffer(types::ARRAY_BUFFER, &buffer);
-        ctx.buffer_data(&data, types::ARRAY_BUFFER, types::STATIC_DRAW);
+        let buffer = BACKEND.lock().unwrap().create_buffer();
+        BACKEND
+            .lock()
+            .unwrap()
+            .bind_buffer(types::ARRAY_BUFFER, &buffer);
+        BACKEND
+            .lock()
+            .unwrap()
+            .buffer_data(&data, types::ARRAY_BUFFER, types::STATIC_DRAW);
 
         if let Some(attributes) = &vertex_attributes {
             let stride = attributes
@@ -51,8 +60,8 @@ impl Entity {
                             .try_into()
                             .expect("Vertex attribute index cast to u32 failed");
 
-                        ctx.enable_vertex_attrib_array(ind);
-                        ctx.vertex_attrib_pointer(
+                        BACKEND.lock().unwrap().enable_vertex_attrib_array(ind);
+                        BACKEND.lock().unwrap().vertex_attrib_pointer(
                             ind,
                             attribute
                                 .count

@@ -14,6 +14,8 @@ js-sys ={ version = "0.3.60", optional = true }
 wasm-bindgen ={ version = "0.2.83", optional = true }
 gl = { version = "0.14.0", optional = true }
 glfw = { git = "https://github.com/bjz/glfw-rs.git", optional = true }
+once_cell = "1.17.0"
+send_wrapper = "0.6.0"
 
 [dependencies.web-sys]
 version = "0.3.60"

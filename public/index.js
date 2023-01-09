@@ -1,4 +1,4 @@
-import("./wasm/reindeer.js")
+import("./wasm/hello_world.js")
   .then((wasm) => {
     wasm.default();
     wasm.run();
