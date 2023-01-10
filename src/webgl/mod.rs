@@ -3,7 +3,7 @@ pub mod shader;
 use crate::BACKEND;
 
 use super::{backend::Backend, WINDOW_HEIGHT, WINDOW_WIDTH};
-use std::{cell::RefCell, rc::Rc, vec};
+use std::{cell::RefCell, rc::Rc};
 use wasm_bindgen::{prelude::Closure, JsCast};
 use web_sys::{
     window, WebGl2RenderingContext, WebGlBuffer, WebGlProgram, WebGlShader, WebGlVertexArrayObject,

@@ -8,8 +8,6 @@ pub mod math;
 #[cfg(feature = "webgl")]
 pub mod webgl;
 #[cfg(feature = "webgl")]
-use wasm_bindgen::prelude::wasm_bindgen;
-#[cfg(feature = "webgl")]
 pub use web_sys::WebGl2RenderingContext as types;
 #[cfg(feature = "webgl")]
 pub use webgl as lib;
@@ -26,14 +24,8 @@ pub use opengl as lib;
 pub mod entity;
 pub mod scene;
 
-use crate::common::Shader;
-use crate::{
-    backend::Backend,
-    common::Vec3,
-    math::{get_rotation_matrix, get_scale_matrix, get_translation_matrix, mat4_mat4_mul},
-};
+use crate::backend::Backend;
 pub use common::{ShaderProgram, VERTEX_ATTRIBUTE_FVEC3};
-use entity::Entity;
 use include_dir::{include_dir, Dir, DirEntry::File};
 use std::sync::Mutex;
 use std::{collections::HashMap, str};
