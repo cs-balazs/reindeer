@@ -1,5 +1,7 @@
 pub mod shader;
 
+use crate::BACKEND;
+
 use super::{backend::Backend, WINDOW_HEIGHT, WINDOW_WIDTH};
 use std::{cell::RefCell, rc::Rc, vec};
 use wasm_bindgen::{prelude::Closure, JsCast};
@@ -124,7 +126,9 @@ impl Backend for Context {
         let g = f.clone();
 
         *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
+            BACKEND.lock().unwrap().before_draw();
             draw_frame();
+            BACKEND.lock().unwrap().after_draw();
             request_animation_frame(f.borrow().as_ref().unwrap());
         }) as Box<dyn FnMut()>));
 

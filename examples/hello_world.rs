@@ -5,12 +5,9 @@ use reindeer::math::{
     get_rotation_matrix, get_scale_matrix, get_translation_matrix, mat4_mat4_mul,
 };
 use reindeer::scene::Drawable;
-use reindeer::{self, ShaderProgram, BACKEND, VERTEX_ATTRIBUTE_FVEC3};
+use reindeer::{self, ShaderProgram, VERTEX_ATTRIBUTE_FVEC3};
 
-#[cfg(feature = "webgl")]
-use wasm_bindgen::prelude::wasm_bindgen;
-
-#[cfg_attr(feature = "webgl", wasm_bindgen(start))]
+#[cfg_attr(feature = "webgl", wasm_bindgen::prelude::wasm_bindgen(start))]
 pub fn run() {
     reindeer::init();
 
@@ -123,7 +120,7 @@ pub fn run() {
 
     let scene = vec![obj, light_source];
 
-    BACKEND.lock().unwrap().set_clear_color(1.0, 1.0, 1.0, 1.0);
+    reindeer::set_clear_color(1.0, 1.0, 1.0, 1.0);
 
     let rotation_angle = 0.002;
     let mut rotation_amount = 0.0;
@@ -135,7 +132,7 @@ pub fn run() {
     let light_source_model = mat4_mat4_mul(translation, scale);
 
     reindeer::lib::Context::draw_loop(move || {
-        BACKEND.lock().unwrap().before_draw();
+        // BACKEND.lock().unwrap().before_draw();
 
         let rotation = get_rotation_matrix(rotation_amount, rotation_amount, rotation_amount);
         let light_source_rotation = get_rotation_matrix(
@@ -159,7 +156,7 @@ pub fn run() {
         rotation_amount += rotation_angle;
         light_source_rotation_amount += rotation_angle;
 
-        BACKEND.lock().unwrap().after_draw();
+        // BACKEND.lock().unwrap().after_draw();
     });
 }
 fn main() {

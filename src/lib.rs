@@ -74,3 +74,10 @@ lazy_static! {
 pub fn init() {
     BACKEND.lock().unwrap().valid();
 }
+
+pub fn set_clear_color(red: f32, green: f32, blue: f32, alpha: f32) {
+    BACKEND
+        .lock()
+        .unwrap()
+        .set_clear_color(red, green, blue, alpha)
+}

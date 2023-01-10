@@ -1,3 +1,5 @@
+use crate::BACKEND;
+
 use super::{backend::Backend, WINDOW_HEIGHT, WINDOW_WIDTH};
 use gl::types::{GLfloat, GLsizeiptr};
 use glfw::{Context as GLFWContext, WindowEvent};
@@ -148,7 +150,9 @@ impl Backend for Context {
 
     fn draw_loop(mut draw_frame: impl FnMut() + 'static) {
         loop {
+            BACKEND.lock().unwrap().before_draw();
             draw_frame();
+            BACKEND.lock().unwrap().after_draw();
         }
     }
 }
