@@ -49,8 +49,7 @@ const SHADERS_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/assets/shaders/opengl
 use once_cell::sync::Lazy;
 use send_wrapper::SendWrapper;
 
-// TODO: Shouldn't be public
-pub static BACKEND: Mutex<Lazy<SendWrapper<lib::Context>>> =
+static BACKEND: Mutex<Lazy<SendWrapper<lib::Context>>> =
     Mutex::new(Lazy::new(|| SendWrapper::new(lib::Context::new())));
 
 lazy_static! {
